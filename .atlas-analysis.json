@@ -1,0 +1,97 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Tabulate",
+  "projectDescription": "A modern C++ library for creating beautifully formatted tables in terminal applications",
+  "theme": "palm",
+  "primaryColor": "#040404",
+  "lightColor": "#8a8a8a",
+  "darkColor": "#dcdcdc",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Core Concepts",
+        "pages": [
+          "concepts/tables",
+          "concepts/formatting",
+          "concepts/style-inheritance"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/alignment",
+          "guides/colors-and-styles",
+          "guides/borders-and-corners",
+          "guides/word-wrapping",
+          "guides/iteration"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api/table",
+          "api/row",
+          "api/column",
+          "api/cell",
+          "api/format",
+          "api/row-stream"
+        ]
+      },
+      {
+        "group": "Advanced",
+        "pages": [
+          "advanced/nested-tables",
+          "advanced/utf8-support",
+          "advanced/exporters"
+        ]
+      },
+      {
+        "group": "Examples",
+        "pages": [
+          "examples/overview",
+          "examples/movies",
+          "examples/class-diagram",
+          "examples/unicode"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Header-only library with single-header option",
+    "Comprehensive formatting (alignment, colors, borders, font styles)",
+    "Word wrapping and multi-byte character support",
+    "Style inheritance model (cell, row, table levels)",
+    "Nested tables support",
+    "Export to Markdown, AsciiDoc, and LaTeX",
+    "Range-based iteration over tables, rows, and columns",
+    "C++11 compatible with optional C++17 features"
+  ],
+  "publicApiSurface": [
+    "Table::add_row()",
+    "Table::format()",
+    "Table::print()",
+    "Table::row()",
+    "Table::column()",
+    "Row::format()",
+    "Column::format()",
+    "Cell::format()",
+    "Format::font_align()",
+    "Format::font_style()",
+    "Format::font_color()",
+    "Format::border()",
+    "Format::corner()",
+    "Format::width()",
+    "RowStream operator<<",
+    "MarkdownExporter::dump()",
+    "AsciiDocExporter::dump()",
+    "LatexExporter::dump()"
+  ]
+}
