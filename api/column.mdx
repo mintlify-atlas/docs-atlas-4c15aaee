@@ -1,0 +1,259 @@
+---
+title: 'Column'
+description: 'Class for accessing and formatting table columns'
+---
+
+## Overview
+
+The `Column` class represents a single column in a table. It provides methods for accessing cells and applying uniform formatting to all cells in a column.
+
+## Constructor
+
+<Note>
+Column objects are created by calling `Table::column(index)`. They represent a vertical slice of the table.
+</Note>
+
+## Methods
+
+### operator[]
+
+```cpp
+Cell& operator[](size_t index)
+```
+
+Accesses a cell in the column by row index using bracket notation.
+
+<ParamField path="index" type="size_t">
+  Zero-based row index.
+</ParamField>
+
+**Returns:** Reference to the cell at the specified row index.
+
+**Example:**
+```cpp
+// Format the first cell in column 0
+table.column(0)[0].format().font_style({FontStyle::bold});
+```
+
+### cells
+
+```cpp
+std::vector<std::reference_wrapper<Cell>> cells() const
+```
+
+Returns all cells in the column.
+
+**Returns:** Vector of reference wrappers to Cell objects.
+
+### size
+
+```cpp
+size_t size() const
+```
+
+Returns the number of cells in the column.
+
+**Returns:** Number of cells (rows) in the column.
+
+### format
+
+```cpp
+ColumnFormat format()
+```
+
+Accesses the column's format settings. Returns a `ColumnFormat` object that applies formatting to all cells in the column.
+
+**Returns:** ColumnFormat object for configuring the column.
+
+**Example:**
+```cpp
+table.column(0).format()
+  .width(20)
+  .font_align(FontAlign::left)
+  .padding_left(2);
+
+table.column(1).format()
+  .width(15)
+  .font_align(FontAlign::center);
+```
+
+## Iterators
+
+### begin / end
+
+```cpp
+auto begin() -> CellIterator
+auto end() -> CellIterator
+```
+
+Provides iteration over cells in the column.
+
+**Example:**
+```cpp
+for (auto& cell : table.column(2)) {
+  cell.format().font_color(Color::blue);
+}
+```
+
+## ColumnFormat Methods
+
+The `ColumnFormat` class provides a fluent interface for formatting all cells in a column. All methods return a reference to the ColumnFormat object for method chaining.
+
+### Dimensions
+
+- `width(size_t value)` - Sets the width for all cells in the column
+- `height(size_t value)` - Sets the height for all cells in the column
+
+### Padding
+
+- `padding(size_t value)` - Sets padding on all sides for all cells
+- `padding_left(size_t value)` - Sets left padding
+- `padding_right(size_t value)` - Sets right padding
+- `padding_top(size_t value)` - Sets top padding
+- `padding_bottom(size_t value)` - Sets bottom padding
+
+### Borders
+
+- `border(const std::string& value)` - Sets all border characters
+- `border_left(const std::string& value)` - Sets left border character
+- `border_right(const std::string& value)` - Sets right border character
+- `border_top(const std::string& value)` - Sets top border character
+- `border_bottom(const std::string& value)` - Sets bottom border character
+
+### Border Colors
+
+- `border_color(Color value)` - Sets color for all borders
+- `border_left_color(Color value)` - Sets left border color
+- `border_right_color(Color value)` - Sets right border color
+- `border_top_color(Color value)` - Sets top border color
+- `border_bottom_color(Color value)` - Sets bottom border color
+
+### Background Colors
+
+- `border_background_color(Color value)` - Sets background color for all borders
+- `border_left_background_color(Color value)` - Sets left border background color
+- `border_right_background_color(Color value)` - Sets right border background color
+- `border_top_background_color(Color value)` - Sets top border background color
+- `border_bottom_background_color(Color value)` - Sets bottom border background color
+
+### Corners
+
+- `corner(const std::string& value)` - Sets all corner characters
+- `corner_color(Color value)` - Sets color for all corners
+- `corner_background_color(Color value)` - Sets background color for all corners
+
+### Column Separator
+
+- `column_separator(const std::string& value)` - Sets column separator character
+- `column_separator_color(Color value)` - Sets column separator color
+- `column_separator_background_color(Color value)` - Sets column separator background color
+
+### Font Styling
+
+- `font_align(FontAlign value)` - Sets text alignment (left, center, right)
+- `font_style(const std::vector<FontStyle>& style)` - Sets font styles (bold, italic, etc.)
+- `font_color(Color value)` - Sets font color
+- `font_background_color(Color value)` - Sets font background color
+
+### Convenience Methods
+
+- `color(Color value)` - Sets font, border, and corner colors
+- `background_color(Color value)` - Sets background colors for font, borders, and corners
+
+### Internationalization
+
+- `multi_byte_characters(bool value)` - Enables support for multi-byte characters
+- `locale(const std::string& value)` - Sets locale for text processing
+
+## Usage Examples
+
+### Setting Column Widths
+
+```cpp
+Table table;
+table.add_row({"Name", "Email", "Phone"});
+table.add_row({"Alice", "alice@example.com", "555-1234"});
+
+// Set specific widths for each column
+table.column(0).format().width(15);
+table.column(1).format().width(30);
+table.column(2).format().width(12);
+```
+
+### Aligning Columns
+
+```cpp
+Table prices;
+prices.add_row({"Item", "Price", "Quantity"});
+prices.add_row({"Apple", "$0.99", "100"});
+prices.add_row({"Banana", "$0.59", "150"});
+
+// Left-align names, right-align numbers
+prices.column(0).format().font_align(FontAlign::left);
+prices.column(1).format().font_align(FontAlign::right);
+prices.column(2).format().font_align(FontAlign::center);
+```
+
+### Coloring Columns
+
+```cpp
+Table status;
+status.add_row({"Task", "Status", "Priority"});
+status.add_row({"Task 1", "Complete", "High"});
+status.add_row({"Task 2", "In Progress", "Medium"});
+
+// Color the status column based on state
+status.column(1).format().font_color(Color::green);
+status.column(2).format().font_color(Color::red);
+```
+
+### Custom Column Separators
+
+```cpp
+Table data;
+data.add_row({"A", "B", "C", "D"});
+data.add_row({"1", "2", "3", "4"});
+
+// Use different separator for specific columns
+data.column(0).format().column_separator(":");
+data.column(2).format().column_separator(" | ");
+```
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table financial_report;
+  
+  // Add header and data
+  financial_report.add_row({"Account", "Debit", "Credit", "Balance"});
+  financial_report.add_row({"Checking", "$5,000", "$3,200", "$1,800"});
+  financial_report.add_row({"Savings", "$10,000", "$500", "$9,500"});
+  financial_report.add_row({"Investment", "$25,000", "$5,000", "$20,000"});
+  
+  // Format the account name column
+  financial_report.column(0).format()
+    .width(20)
+    .font_align(FontAlign::left)
+    .font_style({FontStyle::bold});
+  
+  // Format the numeric columns
+  for (size_t i = 1; i <= 3; ++i) {
+    financial_report.column(i).format()
+      .width(15)
+      .font_align(FontAlign::right)
+      .font_color(Color::green);
+  }
+  
+  // Special formatting for the balance column
+  financial_report.column(3).format()
+    .font_style({FontStyle::bold})
+    .font_color(Color::cyan);
+  
+  std::cout << financial_report << std::endl;
+  return 0;
+}
+```

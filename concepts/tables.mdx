@@ -1,0 +1,210 @@
+---
+title: Tables, Rows, Columns, and Cells
+description: Understanding the hierarchical structure of Tabulate tables
+---
+
+Tabulate organizes data in a hierarchical structure: **Tables** contain **Rows**, which contain **Cells**. You can also access data by **Columns**, which provide a vertical view across rows.
+
+## Table
+
+The `Table` class is the top-level container for your tabular data. Create a table and add rows using the `add_row()` method.
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table universal_constants;
+  
+  universal_constants.add_row({"Quantity", "Value"});
+  universal_constants.add_row({"Speed of light in vacuum", "299 792 458 m·s⁻¹"});
+  universal_constants.add_row({"Planck's constant", "6.626 0693(11) × 10⁻³⁴ J·s"});
+  
+  std::cout << universal_constants << std::endl;
+}
+```
+
+### Table Methods
+
+| Method | Description |
+|--------|-------------|
+| `add_row(cells)` | Add a new row to the table with the given cell contents |
+| `operator[](index)` | Access a row by index |
+| `row(index)` | Access a row by index (alternative syntax) |
+| `column(index)` | Access a column by index |
+| `format()` | Get the Format object for table-level styling |
+| `print(stream)` | Print the table to an output stream |
+| `size()` | Get the number of rows in the table |
+| `shape()` | Get the table dimensions as `std::pair<rows, cols>` |
+
+<Tip>
+Use `operator<<` for convenient printing: `std::cout << table << std::endl;`
+</Tip>
+
+## Row
+
+A `Row` represents a horizontal collection of cells. Access rows using `Table[row_index]`.
+
+```cpp
+Table movies;
+movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+
+// Access and format the first row (header)
+movies[0].format()
+  .font_align(FontAlign::center)
+  .font_style({FontStyle::bold})
+  .font_color(Color::yellow);
+```
+
+### Row Methods
+
+| Method | Description |
+|--------|-------------|
+| `operator[](index)` | Access a cell in the row by column index |
+| `cell(index)` | Access a cell by index (alternative syntax) |
+| `format()` | Get the Format object for row-level styling |
+| `size()` | Get the number of cells in the row |
+
+### Range-Based Iteration
+
+Rows support range-based iteration over their cells:
+
+```cpp
+// Iterate over cells in the first row
+for (auto& cell : table[0]) {
+  cell.format()
+    .font_style({FontStyle::underline})
+    .font_align(FontAlign::center);
+}
+```
+
+## Column
+
+A `Column` represents a vertical collection of cells across all rows. Access columns using `Table.column(col_index)`.
+
+```cpp
+Table movies;
+movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+
+// Center align the 'Director' column
+movies.column(2).format()
+  .font_align(FontAlign::center);
+
+// Right align the 'Estimated Budget' column
+movies.column(3).format()
+  .font_align(FontAlign::right);
+```
+
+### Column Methods
+
+| Method | Description |
+|--------|-------------|
+| `operator[](index)` | Access a cell in the column by row index |
+| `format()` | Get the ColumnFormat object for column-level styling |
+| `size()` | Get the number of cells in the column |
+
+<Note>
+Column formatting applies to all cells in that column. This is useful for setting consistent alignment, colors, or padding for an entire column.
+</Note>
+
+### Range-Based Iteration
+
+Columns also support range-based iteration:
+
+```cpp
+// Iterate over cells in the first column
+for (auto& cell : table.column(0)) {
+  if (cell.get_text() != "Company") {
+    cell.format()
+      .font_align(FontAlign::right);
+  }
+}
+```
+
+## Cell
+
+A `Cell` is the fundamental unit of content in a table. Access cells by indexing twice from a table:
+- From a row: `Table[row_index][col_index]`
+- From a column: `Table.column(col_index)[cell_index]`
+
+```cpp
+Table universal_constants;
+universal_constants.add_row({"Quantity", "Value"});
+universal_constants.add_row({"Speed of light in vacuum", "299 792 458 m·s⁻¹"});
+
+// Format a specific cell
+universal_constants[0][1].format()
+  .font_background_color(Color::blue)
+  .font_color(Color::white);
+```
+
+### Cell Content
+
+Cells can contain different types of content:
+- `std::string`
+- `const char*`
+- `string_view`
+- Nested `Table` objects
+
+```cpp
+// String content
+table.add_row({"Cell 1", "Cell 2"});
+
+// Nested table
+Table nested;
+nested.add_row({"Nested", "Content"});
+table.add_row({nested});
+```
+
+<Info>
+When adding nested tables, the nested table is rendered to a string and displayed within the parent cell.
+</Info>
+
+## RowStream
+
+Use `RowStream` for convenient row construction with stream insertion:
+
+```cpp
+Table employees;
+employees.add_row({"Emp. ID", "First Name", "Last Name", "Department", "Pay Rate"});
+employees.add_row(RowStream{} << 101 << "Donald" << "Patrick" << "Finance" << 59.6154);
+employees.add_row(RowStream{} << 102 << "Rachel" << "Williams" << "Marketing" << 34.9707);
+```
+
+This is particularly useful for:
+- Converting non-string types to strings automatically
+- Using stream manipulators (e.g., `std::setprecision`)
+- Building rows dynamically with conditional content
+
+## Iterating Over Tables
+
+Tables support range-based iteration over rows:
+
+```cpp
+Table table;
+table.add_row({"Company", "Contact", "Country"});
+table.add_row({"Alfreds Futterkiste", "Maria Anders", "Germany"});
+table.add_row({"Centro comercial Moctezuma", "Francisco Chang", "Mexico"});
+
+// Iterate over rows in the table
+size_t index = 0;
+for (auto& row : table) {
+  row.format()
+    .font_style({FontStyle::bold});
+  
+  // Set blue background for alternate rows
+  if (index > 0 && index % 2 == 0) {
+    for (auto& cell : row) {
+      cell.format()
+        .font_background_color(Color::blue);
+    }
+  }
+  index += 1;
+}
+```
+
+<Tip>
+Range-based iteration makes it easy to apply formatting patterns like alternating row colors, zebra striping, or column-specific styles without manually indexing each cell.
+</Tip>

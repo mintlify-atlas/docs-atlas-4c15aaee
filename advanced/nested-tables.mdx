@@ -1,0 +1,159 @@
+---
+title: Nested Tables
+description: Learn how to embed tables within tables to create complex layouts like UML diagrams
+---
+
+Tabulate supports nesting tables within other tables, enabling you to create sophisticated layouts and hierarchical structures. The `Table.add_row()` method accepts both `std::string` and `tabulate::Table` objects, making it easy to compose complex table structures.
+
+## Basic Concept
+
+When you add a table as a cell value, it becomes fully embedded within the parent table. The nested table maintains its own formatting and structure while being treated as a single cell in the parent table.
+
+<Steps>
+  <Step title="Create the nested tables">
+    Define separate `Table` objects for each nested component.
+  </Step>
+  
+  <Step title="Format the nested tables">
+    Apply formatting to each nested table independently.
+  </Step>
+  
+  <Step title="Add to parent table">
+    Use `add_row()` to insert nested tables as cell values.
+  </Step>
+  
+  <Step title="Format the parent table">
+    Apply global formatting and alignment to the parent table.
+  </Step>
+</Steps>
+
+## Complete Example: UML Class Diagram
+
+This example demonstrates creating a UML class diagram with nested tables for properties and methods:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table class_diagram;
+
+  // Global styling
+  class_diagram.format().font_style({FontStyle::bold}).font_align(FontAlign::center).width(60);
+
+  // Animal class
+  Table animal;
+  animal.add_row({"Animal"});
+  animal[0].format().font_align(FontAlign::center);
+
+  // Animal properties nested table
+  Table animal_properties;
+  animal_properties.format().width(20);
+  animal_properties.add_row({"+age: Int"});
+  animal_properties.add_row({"+gender: String"});
+  animal_properties[1].format().hide_border_top();
+
+  // Animal methods nested table
+  Table animal_methods;
+  animal_methods.format().width(20);
+  animal_methods.add_row({"+isMammal()"});
+  animal_methods.add_row({"+mate()"});
+  animal_methods[1].format().hide_border_top();
+
+  animal.add_row({animal_properties});
+  animal.add_row({animal_methods});
+  animal[2].format().hide_border_top();
+
+  class_diagram.add_row({animal});
+
+  // Add rows in the class diagram for the up-facing arrow
+  // Thanks to center alignment, these will align just fine
+  class_diagram.add_row({"▲"});
+  class_diagram[1][0].format().hide_border_top().multi_byte_characters(true);
+  
+  class_diagram.add_row({"|"});
+  class_diagram[2].format().hide_border_top();
+  class_diagram.add_row({"|"});
+  class_diagram[3].format().hide_border_top();
+
+  // Duck class
+  Table duck;
+  duck.add_row({"Duck"});
+  duck[0].format().font_align(FontAlign::center);
+
+  // Duck properties nested table
+  Table duck_properties;
+  duck_properties.format().width(40);
+  duck_properties.add_row({"+beakColor: String = \"yellow\""});
+
+  // Duck methods nested table
+  Table duck_methods;
+  duck_methods.format().width(40);
+  duck_methods.add_row({"+swim()"});
+  duck_methods.add_row({"+quack()"});
+  duck_methods[1].format().hide_border_top();
+
+  duck.add_row({duck_properties});
+  duck.add_row({duck_methods});
+  duck[2].format().hide_border_top();
+
+  class_diagram.add_row({duck});
+  class_diagram[4].format().hide_border_top();
+
+  std::cout << class_diagram << std::endl;
+}
+```
+
+<Note>
+The source code for this example is available at `samples/class_diagram.cpp` in the repository.
+</Note>
+
+## Key Formatting Techniques
+
+### Hide Border Top
+
+Use `.format().hide_border_top()` to create seamless transitions between nested table sections:
+
+```cpp
+animal_properties[1].format().hide_border_top();
+```
+
+This removes the top border from the second row, making it appear as a continuous section with the first row.
+
+### Width Control
+
+Set explicit widths for nested tables to maintain consistent layout:
+
+```cpp
+animal_properties.format().width(20);
+duck_properties.format().width(40);
+```
+
+### Multi-byte Characters
+
+When using special characters like arrows (▲), enable multi-byte character support:
+
+```cpp
+class_diagram[1][0].format().multi_byte_characters(true);
+```
+
+## Practical Use Cases
+
+Nested tables are particularly useful for:
+
+- **UML Diagrams**: Representing classes with properties and methods
+- **Hierarchical Data**: Displaying parent-child relationships
+- **Complex Layouts**: Creating sophisticated table structures with multiple levels
+- **Report Sections**: Organizing data into logical groupings
+
+<Warning>
+Deeply nested tables can become difficult to read. Consider limiting nesting to 2-3 levels for optimal readability.
+</Warning>
+
+## Tips for Success
+
+1. **Plan your structure**: Sketch out the table hierarchy before coding
+2. **Use consistent widths**: Set width constraints to maintain alignment
+3. **Apply formatting strategically**: Format nested tables before adding them to the parent
+4. **Center-align parent tables**: This helps center complex nested structures
+5. **Hide borders selectively**: Use `hide_border_top()` to create seamless sections

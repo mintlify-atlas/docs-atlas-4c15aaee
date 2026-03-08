@@ -1,80 +1,397 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Create your first formatted table with Tabulate in minutes
 ---
 
-## Get started in three steps
+# Quick Start Guide
 
-Get your documentation site running locally and make your first customization.
+Get up and running with Tabulate in just a few minutes. This guide will show you how to create beautifully formatted tables with minimal code.
 
-### Step 1: Set up your local environment
+## Your First Table
+
+Let's start with the simplest possible table:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  
+  movies.add_row({"Movie Name", "Director", "Release Year"});
+  movies.add_row({"Toy Story 4", "Josh Cooley", "2019"});
+  movies.add_row({"Sully", "Clint Eastwood", "2016"});
+  
+  std::cout << movies << std::endl;
+}
+```
+
+<Steps>
+  <Step title="Include the header">
+    ```cpp
+    #include <tabulate/table.hpp>
+    using namespace tabulate;
+    ```
+  </Step>
+  
+  <Step title="Create a Table object">
+    ```cpp
+    Table movies;
+    ```
+  </Step>
+  
+  <Step title="Add rows with data">
+    ```cpp
+    movies.add_row({"Movie Name", "Director", "Release Year"});
+    movies.add_row({"Toy Story 4", "Josh Cooley", "2019"});
+    ```
+  </Step>
+  
+  <Step title="Print the table">
+    ```cpp
+    std::cout << movies << std::endl;
+    ```
+  </Step>
+</Steps>
+
+That's it! You've created your first table.
+
+## Adding Style
+
+Now let's make it look better with some formatting:
+
+<CodeGroup>
+
+```cpp Basic Formatting
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  movies.add_row({"Movie Name", "Director", "Release Year"});
+  movies.add_row({"Toy Story 4", "Josh Cooley", "2019"});
+  movies.add_row({"Sully", "Clint Eastwood", "2016"});
+  
+  // Format the header row
+  movies[0].format()
+    .font_color(Color::yellow)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::bold});
+  
+  std::cout << movies << std::endl;
+}
+```
+
+```cpp Column Alignment
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  movies.add_row({"S/N", "Movie Name", "Director", "Budget", "Release Date"});
+  movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+  movies.add_row({"tt3263904", "Sully", "Clint Eastwood", "$60,000,000", "9 September 2016"});
+  
+  // Center align Director column
+  movies.column(2).format().font_align(FontAlign::center);
+  
+  // Right align Budget and Release Date columns
+  movies.column(3).format().font_align(FontAlign::right);
+  movies.column(4).format().font_align(FontAlign::right);
+  
+  // Format header
+  for (size_t i = 0; i < 5; ++i) {
+    movies[0][i].format()
+      .font_color(Color::yellow)
+      .font_align(FontAlign::center)
+      .font_style({FontStyle::bold});
+  }
+  
+  std::cout << movies << std::endl;
+}
+```
+
+```cpp Full Styling
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+  
+  table.add_row({"Quantity", "Value"});
+  table.add_row({"Speed of light in vacuum", "299 792 458 m·s⁻¹"});
+  table.add_row({"Planck's constant", "6.626 0693(11) × 10⁻³⁴ J·s"});
+  table.add_row({"Gravitational constant", "6.6742(10) × 10⁻¹¹m³·kg⁻¹·s⁻²"});
+  
+  // Style the entire table
+  table.format()
+    .font_style({FontStyle::bold})
+    .border_top(" ")
+    .border_bottom(" ")
+    .border_left(" ")
+    .border_right(" ")
+    .corner(" ");
+  
+  // Style the header row
+  table[0].format()
+    .padding_top(1)
+    .padding_bottom(1)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::underline})
+    .font_background_color(Color::red);
+  
+  // Style the value column
+  table.column(1).format().font_color(Color::yellow);
+  
+  // Style a specific cell
+  table[0][1].format()
+    .font_background_color(Color::blue)
+    .font_color(Color::white);
+  
+  std::cout << table << std::endl;
+}
+```
+
+</CodeGroup>
+
+## Using RowStream for Dynamic Data
+
+When working with different data types, use `RowStream` to format values on the fly:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table employees;
+  
+  employees.add_row({"Emp. ID", "First Name", "Last Name", "Department", "Pay Rate"});
+  
+  // Use RowStream to insert various types
+  employees.add_row(RowStream{} << 101 << "Donald" << "Patrick" << "Finance" << 59.62);
+  employees.add_row(RowStream{} << 102 << "Rachel" << "Williams" << "Marketing" << 34.97);
+  employees.add_row(RowStream{} << 103 << "Ian" << "Jacob" << "Engineering" << 57.00);
+  
+  std::cout << employees << std::endl;
+}
+```
+
+<Note>
+  `RowStream` automatically converts integers, floats, and other types to strings using `operator<<`.
+</Note>
+
+## Key Formatting Methods
+
+Here are the essential formatting methods you'll use most often:
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion title="Font Styling">
+    ```cpp
+    cell.format()
+      .font_style({FontStyle::bold})           // bold, italic, underline, etc.
+      .font_color(Color::red)                  // 8 colors available
+      .font_background_color(Color::yellow)    // background color
+      .font_align(FontAlign::center);          // left, center, right
+    ```
+
+    Available font styles:
+    - `FontStyle::bold`
+    - `FontStyle::italic`
+    - `FontStyle::underline`
+    - `FontStyle::blink`
+    - `FontStyle::dark`
+    - `FontStyle::crossed`
+    - `FontStyle::reverse`
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+
+  <Accordion title="Borders & Corners">
+    ```cpp
+    table.format()
+      .border_top("=")
+      .border_bottom("=")
+      .border_left("|")
+      .border_right("|")
+      .corner("+");
+
+    // Or style all borders at once
+    table.format().border("-");
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+    // Color borders
+    table.format()
+      .border_color(Color::cyan)
+      .corner_color(Color::magenta);
+    ```
+  </Accordion>
+
+  <Accordion title="Cell Dimensions">
+    ```cpp
+    cell.format()
+      .width(30)              // Set cell width
+      .padding_top(1)         // Add padding
+      .padding_bottom(1)
+      .padding_left(2)
+      .padding_right(2);
+    ```
+  </Accordion>
+
+  <Accordion title="Multi-byte Characters">
+    ```cpp
+    // Enable for UTF-8, emoji, CJK characters
+    table.format().multi_byte_characters(true);
+    
+    // Or for specific cells/columns
+    table.column(1).format().multi_byte_characters(true);
+    ```
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## Accessing Table Elements
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+Tabulate provides intuitive access to rows, columns, and cells:
+
+```cpp
+Table table;
+// ... add rows ...
+
+// Access a row by index
+Row& row = table[0];
+row.format().font_color(Color::red);
+
+// Access a column by index
+Column col = table.column(1);
+col.format().font_align(FontAlign::right);
+
+// Access a specific cell
+table[0][1].format().font_style({FontStyle::bold});
+
+// Alternative: row then column
+table.row(2).format().font_background_color(Color::blue);
+```
+
+## Range-Based Iteration
+
+Iterate over rows and cells easily:
+
+```cpp
+// Iterate over all rows
+for (auto& row : table) {
+  row.format().font_style({FontStyle::bold});
+}
+
+// Iterate over cells in a row
+for (auto& cell : table[0]) {
+  cell.format().font_align(FontAlign::center);
+}
+
+// Iterate over cells in a column
+for (auto& cell : table.column(0)) {
+  cell.format().font_color(Color::yellow);
+}
+```
+
+## Complete Example
+
+Here's a complete, real-world example that demonstrates multiple features:
+
+```cpp
+#include <iostream>
+#include <tabulate/table.hpp>
+
+using namespace tabulate;
+
+int main() {
+  Table company;
+
+  company.add_row({"Company", "Contact", "Country"});
+  company.add_row({"Alfreds Futterkiste", "Maria Anders", "Germany"});
+  company.add_row({"Centro comercial Moctezuma", "Francisco Chang", "Mexico"});
+  company.add_row({"Ernst Handel", "Roland Mendel", "Austria"});
+  company.add_row({"Island Trading", "Helen Bennett", "UK"});
+  company.add_row({"Magazzini Alimentari Riuniti", "Giovanni Rovelli", "Italy"});
+
+  // Set column widths
+  company.column(0).format().width(40);
+  company.column(1).format().width(30);
+  company.column(2).format().width(30);
+
+  // Format header row
+  for (auto& cell : company[0]) {
+    cell.format()
+      .font_style({FontStyle::underline})
+      .font_align(FontAlign::center);
+  }
+
+  // Right-align first column (except header)
+  size_t index = 0;
+  for (auto& cell : company.column(0)) {
+    if (index > 0) {
+      cell.format().font_align(FontAlign::right);
+    }
+    index++;
+  }
+
+  // Add alternating row colors
+  index = 0;
+  for (auto& row : company) {
+    row.format().font_style({FontStyle::bold});
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    // Blue background for even rows (skip header)
+    if (index > 0 && index % 2 == 0) {
+      for (auto& cell : row) {
+        cell.format().font_background_color(Color::blue);
+      }
+    }
+    index++;
+  }
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  std::cout << company << std::endl;
+  
+  return 0;
+}
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
+## Tips for Success
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Start Simple" icon="seedling">
+    Begin with basic tables and gradually add formatting as needed.
+  </Card>
+  
+  <Card title="Use the Hierarchy" icon="sitemap">
+    Format tables for global styles, rows/columns for groups, cells for specifics.
+  </Card>
+  
+  <Card title="Test Colors" icon="palette">
+    Terminal color appearance varies - test with your target environment.
+  </Card>
+  
+  <Card title="Explore Samples" icon="code">
+    Check out the `samples/` directory for more advanced examples.
+  </Card>
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Remember: formatting cascades from table → row/column → cell. Later formatting overrides earlier settings.
 </Note>
+
+## Next Steps
+
+Now that you know the basics, explore advanced features:
+
+<CardGroup cols={2}>
+  <Card title="Formatting Options" icon="wand-magic-sparkles" href="/concepts/formatting">
+    Deep dive into all formatting capabilities
+  </Card>
+  
+  <Card title="Nested Tables" icon="table-cells" href="/advanced/nested-tables">
+    Learn how to create complex layouts with nested tables
+  </Card>
+  
+  <Card title="Export Formats" icon="file-export" href="/advanced/exporters">
+    Export tables to Markdown and AsciiDoc
+  </Card>
+  
+  <Card title="API Reference" icon="book" href="/api/table">
+    Complete API documentation
+  </Card>
+</CardGroup>

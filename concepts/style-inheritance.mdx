@@ -1,0 +1,379 @@
+---
+title: Style Inheritance Model
+description: Understanding how formatting cascades from table to row to cell level
+---
+
+Tabulate uses a hierarchical style inheritance model that allows you to set defaults at the table level while overriding them at more specific levels (row, column, or cell).
+
+## Inheritance Hierarchy
+
+When rendering each cell, Tabulate applies formatting in this order of precedence:
+
+1. **Cell-level formatting** (highest priority)
+2. **Row-level formatting**
+3. **Column-level formatting**
+4. **Table-level formatting**
+5. **Default formatting** (lowest priority)
+
+<Info>
+More specific formatting always overrides more general formatting. This allows you to set broad defaults and selectively override them where needed.
+</Info>
+
+## How It Works
+
+```cpp
+Table table;
+table.add_row({"A1", "A2", "A3"});
+table.add_row({"B1", "B2", "B3"});
+table.add_row({"C1", "C2", "C3"});
+
+// Table-level: all cells will be bold
+table.format().font_style({FontStyle::bold});
+
+// Row-level: all cells in row 1 will be yellow (and still bold from table)
+table[1].format().font_color(Color::yellow);
+
+// Cell-level: this specific cell will be red (overrides yellow, still bold)
+table[1][1].format().font_color(Color::red);
+```
+
+**Result:**
+- Cell `[0][0]`, `[0][1]`, `[0][2]`: Bold (from table)
+- Cell `[1][0]`: Bold + Yellow (from table + row)
+- Cell `[1][1]`: Bold + Red (from table + cell, cell overrides row)
+- Cell `[1][2]`: Bold + Yellow (from table + row)
+- Cell `[2][0]`, `[2][1]`, `[2][2]`: Bold (from table)
+
+## Default Formatting
+
+When no formatting is specified, Tabulate uses these defaults:
+
+```cpp
+// Font
+font_align = FontAlign::left
+font_style = {} (empty, no styles)
+font_color = Color::none
+font_background_color = Color::none
+
+// Padding
+padding_left = 1
+padding_right = 1
+padding_top = 0
+padding_bottom = 0
+
+// Borders
+border_top = "-"
+border_bottom = "-"
+border_left = "|"
+border_right = "|"
+show_border_left = true
+show_border_right = true
+show_border_top = true
+show_border_bottom = true
+
+// Corners
+corner_top_left = "+"
+corner_top_right = "+"
+corner_bottom_left = "+"
+corner_bottom_right = "+"
+
+// Column separator
+column_separator = "|"
+
+// Internationalization
+multi_byte_characters = false
+locale = ""
+trim_mode = TrimMode::kBoth
+
+// Other
+show_row_separator = false
+```
+
+## Inheritance in Action
+
+### Example 1: Table-Wide Styling with Cell Override
+
+```cpp
+Table table;
+table.add_row({"Normal", "Normal", "Special"});
+table.add_row({"Normal", "Normal", "Normal"});
+
+// Apply blue background to entire table
+table.format().font_background_color(Color::blue);
+
+// Override specific cell with red background
+table[0][2].format().font_background_color(Color::red);
+```
+
+**Result:**
+- Most cells: Blue background
+- Cell `[0][2]`: Red background (overrides table-level blue)
+
+### Example 2: Header Row with Highlighted Cell
+
+```cpp
+Table universal_constants;
+universal_constants.add_row({"Quantity", "Value"});
+universal_constants.add_row({"Speed of light", "299 792 458 m·s⁻¹"});
+
+// Format entire header row
+universal_constants[0].format()
+  .font_background_color(Color::red)
+  .font_align(FontAlign::center)
+  .font_style({FontStyle::underline});
+
+// Highlight one specific cell in header
+universal_constants[0][1].format()
+  .font_background_color(Color::blue)
+  .font_color(Color::white);
+```
+
+**Result:**
+- Cell `[0][0]`: Red background, centered, underlined
+- Cell `[0][1]`: **Blue** background (overrides red), **white** text, centered (inherited), underlined (inherited)
+
+<Tip>
+Notice how the cell-level formatting overrides `font_background_color` and `font_color` but inherits `font_align` and `font_style` from the row level.
+</Tip>
+
+### Example 3: Column Formatting with Row Override
+
+```cpp
+Table movies;
+movies.add_row({"S/N", "Movie Name", "Director", "Budget"});
+movies.add_row({"1", "Toy Story 4", "Josh Cooley", "$200M"});
+movies.add_row({"2", "Sully", "Clint Eastwood", "$60M"});
+
+// Right-align the budget column
+movies.column(3).format().font_align(FontAlign::right);
+
+// Center-align the header row (overrides column alignment for header)
+movies[0].format().font_align(FontAlign::center);
+```
+
+**Result:**
+- Header row (row 0): All cells centered
+- Budget column (column 3), rows 1-2: Right-aligned
+- Other cells: Left-aligned (default)
+
+## Format Merging
+
+Tabulate implements style inheritance through format merging. When rendering a cell:
+
+```cpp
+// Pseudocode for how Tabulate resolves cell formatting
+Format resolved_format = Format::merge(
+    Format::merge(
+        Format::merge(cell_format, row_format),
+        column_format
+    ),
+    table_format
+);
+```
+
+The `Format::merge(first, second)` function:
+- Takes two formats
+- Returns a new format with properties from both
+- **First format has higher precedence** - its values override second's values
+- If a property is not set in first, it uses second's value
+
+<Note>
+Font styles are merged using set union, so multiple style sources can contribute styles that are all applied together.
+</Note>
+
+## Practical Patterns
+
+### Pattern 1: Styled Header with Default Body
+
+```cpp
+Table table;
+table.add_row({"Name", "Age", "City"});
+table.add_row({"Alice", "30", "NYC"});
+table.add_row({"Bob", "25", "LA"});
+
+// Style only the header
+table[0].format()
+  .font_style({FontStyle::bold})
+  .font_color(Color::yellow)
+  .font_align(FontAlign::center);
+
+// Body rows use defaults (left-aligned, no color, no bold)
+```
+
+### Pattern 2: Alternating Row Colors
+
+```cpp
+Table table;
+table.add_row({"Col1", "Col2", "Col3"});
+table.add_row({"A1", "A2", "A3"});
+table.add_row({"B1", "B2", "B3"});
+table.add_row({"C1", "C2", "C3"});
+
+// Style rows with alternating colors
+for (size_t i = 1; i < table.size(); ++i) {
+  if (i % 2 == 0) {
+    table[i].format().font_background_color(Color::blue);
+  }
+}
+```
+
+### Pattern 3: Column Types with Special Cells
+
+```cpp
+Table table;
+table.add_row({"ID", "Name", "Amount"});
+table.add_row({"1", "Item A", "100.00"});
+table.add_row({"2", "Item B", "250.50"});
+table.add_row({"TOTAL", "", "350.50"});
+
+// Right-align the amount column
+table.column(2).format().font_align(FontAlign::right);
+
+// Bold the total row
+table[3].format().font_style({FontStyle::bold});
+
+// The total row's amount cell is both right-aligned (from column)
+// and bold (from row) - inheritance works together!
+```
+
+### Pattern 4: Global Style with Exceptions
+
+```cpp
+Table table;
+table.add_row({"Normal", "Normal", "Normal"});
+table.add_row({"Normal", "ERROR", "Normal"});
+table.add_row({"Normal", "Normal", "Normal"});
+
+// Set table-wide padding
+table.format().padding(2);
+
+// Highlight error cell
+table[1][1].format()
+  .font_color(Color::red)
+  .font_style({FontStyle::bold});
+  // Padding of 2 is still inherited from table level
+```
+
+## Column vs. Row Formatting
+
+When both column and row formatting apply to a cell, **row formatting takes precedence** because it's more specific in the hierarchy.
+
+```cpp
+Table table;
+table.add_row({"A", "B"});
+
+// Column wants blue
+table.column(0).format().font_color(Color::blue);
+
+// Row wants red
+table[0].format().font_color(Color::red);
+
+// Cell [0][0] will be RED (row wins over column)
+```
+
+The precedence order is:
+1. Cell (highest)
+2. Row
+3. Column
+4. Table
+5. Default (lowest)
+
+<Info>
+This precedence model allows row-level overrides to affect entire rows uniformly, while column formatting provides column-wide defaults.
+</Info>
+
+## Best Practices
+
+### 1. Set Defaults at the Table Level
+
+```cpp
+// Good: set common properties once
+table.format()
+  .padding_left(2)
+  .padding_right(2)
+  .font_style({FontStyle::bold});
+```
+
+### 2. Use Row Formatting for Headers
+
+```cpp
+// Good: format header row as a unit
+table[0].format()
+  .font_background_color(Color::blue)
+  .font_color(Color::white)
+  .font_align(FontAlign::center);
+```
+
+### 3. Use Column Formatting for Data Types
+
+```cpp
+// Good: format columns by data type
+table.column(0).format().font_align(FontAlign::left);    // IDs
+table.column(1).format().font_align(FontAlign::left);    // Names
+table.column(2).format().font_align(FontAlign::right);   // Numbers
+table.column(3).format().font_align(FontAlign::center);  // Status
+```
+
+### 4. Use Cell Formatting Sparingly
+
+```cpp
+// Good: highlight specific important cells
+table[5][2].format()
+  .font_color(Color::red)        // Error value
+  .font_style({FontStyle::bold});
+
+// Avoid: formatting every cell individually (use row/column/table instead)
+```
+
+<Tip>
+Think of inheritance as "defaults that can be overridden." Set broad defaults at high levels and use lower levels only when you need to diverge from those defaults.
+</Tip>
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+  table.add_row({"Company", "Contact", "Country"});
+  table.add_row({"Alfreds Futterkiste", "Maria Anders", "Germany"});
+  table.add_row({"Centro comercial Moctezuma", "Francisco Chang", "Mexico"});
+  table.add_row({"Ernst Handel", "Roland Mendel", "Austria"});
+
+  // Table level: set column widths
+  table.column(0).format().width(40);
+  table.column(1).format().width(30);
+  table.column(2).format().width(30);
+
+  // Row level: format header
+  for (auto& cell : table[0]) {
+    cell.format()
+      .font_style({FontStyle::underline})
+      .font_align(FontAlign::center);
+  }
+
+  // Column level: right-align first column (except header)
+  for (auto& cell : table.column(0)) {
+    if (cell.get_text() != "Company") {
+      cell.format().font_align(FontAlign::right);
+    }
+  }
+
+  // Row level: alternate row colors
+  size_t index = 0;
+  for (auto& row : table) {
+    if (index > 0 && index % 2 == 0) {
+      for (auto& cell : row) {
+        cell.format().font_background_color(Color::blue);
+      }
+    }
+    index += 1;
+  }
+
+  std::cout << table << std::endl;
+}
+```
+
+This example demonstrates inheritance at every level working together to create a well-formatted table.

@@ -1,0 +1,109 @@
+---
+title: Introduction
+description: Overview of Tabulate - a modern C++ library for creating beautiful terminal tables
+---
+
+# Introduction to Tabulate
+
+Tabulate is a header-only C++ library for creating beautiful, formatted tables in your terminal applications. With a simple and intuitive API, you can create professional-looking tables with full control over styling, colors, alignment, and formatting.
+
+## What is Tabulate?
+
+Tabulate is a modern C++ library (C++11 and above) that makes it easy to format tabular data for console output. Whether you're building CLI tools, debugging applications, or generating reports, Tabulate helps you present data in a clear and visually appealing way.
+
+<img src="/images/summary.png" alt="Tabulate Example" />
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Header-Only Library" icon="file-code">
+    Simple integration - just add the include directory to your project. No compilation or linking required.
+  </Card>
+  
+  <Card title="Rich Formatting" icon="palette">
+    Full control over fonts, colors, alignment, borders, and styling with a fluent interface.
+  </Card>
+  
+  <Card title="Style Inheritance" icon="layer-group">
+    Flexible style inheritance model: format tables, rows, columns, or individual cells.
+  </Card>
+  
+  <Card title="UTF-8 Support" icon="language">
+    Built-in support for multi-byte characters and international text.
+  </Card>
+  
+  <Card title="Nested Tables" icon="table-cells">
+    Create complex layouts by nesting tables within table cells.
+  </Card>
+  
+  <Card title="Export Options" icon="file-export">
+    Export tables to Markdown and AsciiDoc formats.
+  </Card>
+</CardGroup>
+
+## Style Inheritance Model
+
+Tabulate follows a simple and intuitive style inheritance model. When rendering each cell:
+
+<Steps>
+  <Step title="Cell Formatting">
+    Apply cell formatting if specified
+  </Step>
+  
+  <Step title="Row Formatting">
+    If no cell formatting is specified, apply its parent row formatting
+  </Step>
+  
+  <Step title="Table Formatting">
+    If no row formatting is specified, apply its parent table formatting
+  </Step>
+  
+  <Step title="Default Formatting">
+    If no table formatting is specified, apply the default table formatting
+  </Step>
+</Steps>
+
+This enables you to override formatting for specific cells even when row or table formatting is applied, giving you maximum flexibility.
+
+## Use Cases
+
+Tabulate is perfect for:
+
+- **CLI Applications**: Display structured data in command-line tools
+- **Logging & Debugging**: Pretty-print complex data structures during development
+- **Reports**: Generate formatted reports in terminal applications
+- **Data Visualization**: Present data analysis results in an organized format
+- **Documentation**: Create examples and demonstrations with formatted output
+
+<Note>
+  Tabulate requires C++11 or later. The library automatically detects C++17 support and uses standard library features when available, falling back to lightweight alternatives for C++11/14.
+</Note>
+
+## Terminal Color Support
+
+Thanks to [termcolor](https://github.com/ikalnytskyi/termcolor), Tabulate supports 8 colors:
+
+- Grey
+- Red  
+- Green
+- Yellow
+- Blue
+- Magenta
+- Cyan
+- White
+
+<Note>
+  The appearance of colors varies depending on your terminal settings and theme.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Learn how to install and integrate Tabulate into your project
+  </Card>
+  
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Create your first table in minutes with our quickstart guide
+  </Card>
+</CardGroup>

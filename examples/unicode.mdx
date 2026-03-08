@@ -1,0 +1,305 @@
+---
+title: Unicode Support Example
+description: Display multi-byte Unicode characters from various languages and scripts
+---
+
+This example demonstrates Tabulate's excellent support for Unicode characters, including multi-byte characters from various writing systems around the world.
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+using Row_t = Table::Row_t;
+
+int main() {
+  Table table;
+
+  table.format()
+      .corner("♥")
+      .font_style({FontStyle::bold})
+      .corner_color(Color::magenta)
+      .border_color(Color::magenta);
+
+  table.add_row(Row_t{"English", "I love you"});
+  table.add_row(Row_t{"French", "Je t'aime"});
+  table.add_row(Row_t{"Spanish", "Te amo"});
+  table.add_row(Row_t{"German", "Ich liebe Dich"});
+  table.add_row(Row_t{"Mandarin Chinese", "我爱你"});
+  table.add_row(Row_t{"Japanese", "愛してる"});
+  table.add_row(Row_t{"Korean", "사랑해 (Saranghae)"});
+  table.add_row(Row_t{"Greek", "Σ΄αγαπώ (Se agapo)"});
+  table.add_row(Row_t{"Italian", "Ti amo"});
+  table.add_row(Row_t{"Russian", "Я тебя люблю (Ya tebya liubliu)"});
+  table.add_row(Row_t{"Hebrew", "אני אוהב אותך (Ani ohev otakh)"});
+
+  // Column 1 is using multi-byte characters
+  table.column(1).format().multi_byte_characters(true);
+
+  std::cout << table << std::endl;
+}
+```
+
+## Output
+
+The table will render beautifully with proper character alignment:
+
+```
+♥─────────────────♥────────────────────────────────────────♥
+│ English         │ I love you                             │
+♥─────────────────♥────────────────────────────────────────♥
+│ French          │ Je t'aime                              │
+♥─────────────────♥────────────────────────────────────────♥
+│ Spanish         │ Te amo                                 │
+♥─────────────────♥────────────────────────────────────────♥
+│ German          │ Ich liebe Dich                         │
+♥─────────────────♥────────────────────────────────────────♥
+│ Mandarin Chinese│ 我爱你                                  │
+♥─────────────────♥────────────────────────────────────────♥
+│ Japanese        │ 愛してる                                │
+♥─────────────────♥────────────────────────────────────────♥
+│ Korean          │ 사랑해 (Saranghae)                      │
+♥─────────────────♥────────────────────────────────────────♥
+│ Greek           │ Σ΄αγαπώ (Se agapo)                     │
+♥─────────────────♥────────────────────────────────────────♥
+│ Italian         │ Ti amo                                 │
+♥─────────────────♥────────────────────────────────────────♥
+│ Russian         │ Я тебя люблю (Ya tebya liubliu)        │
+♥─────────────────♥────────────────────────────────────────♥
+│ Hebrew          │ אני אוהב אותך (Ani ohev otakh)         │
+♥─────────────────♥────────────────────────────────────────♥
+```
+
+## Key Features
+
+### Multi-Byte Character Support
+
+The critical setting for proper Unicode rendering:
+
+```cpp
+// Enable multi-byte character support for columns with Unicode text
+table.column(1).format().multi_byte_characters(true);
+```
+
+<Note>
+Without `multi_byte_characters(true)`, the table may appear misaligned because multi-byte characters (like Chinese, Japanese, Korean, Arabic, Hebrew, etc.) take up more bytes than they do display width.
+</Note>
+
+### Custom Corner Characters
+
+Make your tables unique with Unicode corner symbols:
+
+```cpp
+table.format()
+    .corner("♥")                      // Use heart symbol for corners
+    .corner_color(Color::magenta);    // Color the corners
+```
+
+<CodeGroup>
+
+```cpp Hearts
+table.format().corner("♥");
+```
+
+```cpp Stars
+table.format().corner("★");
+```
+
+```cpp Arrows
+table.format().corner("►");
+```
+
+```cpp Bullets
+table.format().corner("●");
+```
+
+</CodeGroup>
+
+<Tip>
+You can use any Unicode character for corners, borders, and column separators to create unique table styles.
+</Tip>
+
+### Border Styling
+
+The entire border can be styled with color and custom characters:
+
+```cpp
+table.format()
+    .corner("♥")
+    .corner_color(Color::magenta)
+    .border_color(Color::magenta)
+    .font_style({FontStyle::bold});
+```
+
+## Supported Writing Systems
+
+Tabulate correctly handles width calculations for:
+
+### East Asian Scripts
+
+```cpp
+table.add_row(Row_t{"Chinese", "你好世界"});
+table.add_row(Row_t{"Japanese", "こんにちは世界"});
+table.add_row(Row_t{"Korean", "안녕하세요"});
+
+// Enable multi-byte support
+table.column(1).format().multi_byte_characters(true);
+```
+
+### Right-to-Left Scripts
+
+```cpp
+table.add_row(Row_t{"Arabic", "مرحبا بالعالم"});
+table.add_row(Row_t{"Hebrew", "שלום עולם"});
+
+// Enable multi-byte support
+table.column(1).format().multi_byte_characters(true);
+```
+
+### Complex Scripts
+
+```cpp
+table.add_row(Row_t{"Hindi", "नमस्ते दुनिया"});
+table.add_row(Row_t{"Thai", "สวัสดีชาวโลก"});
+table.add_row(Row_t{"Bengali", "ওহে বিশ্ব"});
+
+// Enable multi-byte support
+table.column(1).format().multi_byte_characters(true);
+```
+
+### Special Symbols
+
+```cpp
+// Runic characters
+table.add_row(Row_t{"Runic", "ᚠ ᚡ ᚢ ᚣ ᚤ ᚥ ᚦ ᚧ ᚨ ᚩ"});
+
+// Mathematical symbols
+table.add_row(Row_t{"Math", "∑ ∫ ∂ ∇ √ ∞ ≈ ≠ ≤ ≥"});
+
+// Emoji
+table.add_row(Row_t{"Emoji", "🔥 💯 ✨ 🚀 ❤️ 👍 🎉"});
+```
+
+<Note>
+All columns containing multi-byte characters must have `multi_byte_characters(true)` set to ensure proper alignment.
+</Note>
+
+## Advanced Unicode Examples
+
+### Mixed Content
+
+You can mix ASCII and Unicode in the same table:
+
+```cpp
+Table mixed;
+mixed.add_row(Row_t{"Item", "Symbol", "Description"});
+mixed.add_row(Row_t{"Check", "✓", "Task completed"});
+mixed.add_row(Row_t{"Cross", "✗", "Task failed"});
+mixed.add_row(Row_t{"Warning", "⚠", "Attention required"});
+mixed.add_row(Row_t{"Star", "★", "Featured item"});
+
+// Only the Symbol column needs multi-byte support
+mixed.column(1).format().multi_byte_characters(true);
+```
+
+### Box Drawing Characters
+
+Create custom table styles with Unicode box-drawing characters:
+
+```cpp
+Table box;
+box.format()
+    .corner("╔")
+    .border_top("═")
+    .border_bottom("═")
+    .border_left("║")
+    .border_right("║");
+
+box.add_row(Row_t{"Fancy", "Border", "Style"});
+```
+
+### Colored Unicode
+
+Combine colors with Unicode characters:
+
+```cpp
+table.add_row(Row_t{"Fire", "🔥🔥🔥"});
+table[table.size() - 1][1]
+    .format()
+    .multi_byte_characters(true)
+    .font_color(Color::red)
+    .font_style({FontStyle::bold});
+```
+
+## Best Practices
+
+### Always Enable Multi-Byte Support
+
+For any column that might contain Unicode:
+
+```cpp
+// Apply to specific columns
+table.column(1).format().multi_byte_characters(true);
+
+// Or apply to entire table
+table.format().multi_byte_characters(true);
+```
+
+### Test with Actual Data
+
+Unicode rendering can vary by terminal and font:
+
+<Tip>
+Test your tables in the actual environment where they'll be displayed. Some terminals have better Unicode support than others.
+</Tip>
+
+### Consider Font Support
+
+Not all fonts include all Unicode characters:
+
+```cpp
+// Stick to common Unicode ranges for maximum compatibility
+// Most terminals support:
+// - Latin Extended
+// - Greek and Coptic
+// - Cyrillic
+// - CJK (Chinese, Japanese, Korean)
+// - Arabic
+// - Common symbols and emoji
+```
+
+## Troubleshooting
+
+### Misaligned Columns
+
+If columns appear misaligned with Unicode text:
+
+```cpp
+// Solution: Enable multi-byte character support
+table.column(1).format().multi_byte_characters(true);
+```
+
+### Missing Characters
+
+If you see squares or question marks:
+
+- Check that your terminal supports the character set
+- Verify your terminal's encoding is set to UTF-8
+- Try a different font with better Unicode coverage
+
+### Width Calculation Issues
+
+For emoji or wide characters:
+
+```cpp
+// Some emoji are double-width
+table.column(1).format()
+    .multi_byte_characters(true)
+    .width(30);  // Adjust width as needed
+```
+
+## Related Examples
+
+- [Movies Table](/examples/movies) - Standard table formatting
+- [Class Diagram](/examples/class-diagram) - Using Unicode symbols in diagrams
+- [Examples Overview](/examples/overview) - All available examples

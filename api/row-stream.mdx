@@ -1,0 +1,353 @@
+---
+title: 'RowStream'
+description: 'Stream-based interface for building table rows'
+---
+
+## Overview
+
+The `RowStream` class provides a stream-based interface for building table rows dynamically. It allows you to use stream insertion operators (`<<`) to construct rows, similar to how you would use `std::ostringstream`.
+
+## Constructor
+
+```cpp
+RowStream()
+```
+
+Creates a new empty RowStream object.
+
+## Type Conversion
+
+### operator Table::Row_t
+
+```cpp
+operator const Table::Row_t&() const
+```
+
+Implicitly converts the RowStream to a `Table::Row_t`, allowing it to be used directly with `Table::add_row()`.
+
+## Stream Insertion
+
+### `operator<<`
+
+```cpp
+template<typename T>
+RowStream& operator<<(const T& obj)
+```
+
+Inserts a value into the row. For non-string types, the value is converted to a string using `std::ostringstream`.
+
+<ParamField path="obj" type="const T&">
+  The value to insert into the row. Can be any type that supports stream insertion.
+</ParamField>
+
+**Returns:** Reference to the RowStream for method chaining.
+
+```cpp
+RowStream& operator<<(const Table::Row_t::value_type& cell)
+```
+
+Inserts a cell value directly (string, const char*, string_view, or Table).
+
+<ParamField path="cell" type="const Table::Row_t::value_type&">
+  The cell value to insert.
+</ParamField>
+
+**Returns:** Reference to the RowStream for method chaining.
+
+## Stream Formatting
+
+RowStream provides access to standard stream formatting methods:
+
+### copyfmt
+
+```cpp
+RowStream& copyfmt(const RowStream& other)
+RowStream& copyfmt(const std::ios& other)
+```
+
+Copies format flags from another stream.
+
+### fill
+
+```cpp
+std::ostringstream::char_type fill() const
+std::ostringstream::char_type fill(std::ostringstream::char_type ch)
+```
+
+Gets or sets the fill character for padding.
+
+### exceptions
+
+```cpp
+std::ios_base::iostate exceptions() const
+void exceptions(std::ios_base::iostate except)
+```
+
+Gets or sets exception mask.
+
+### imbue / getloc
+
+```cpp
+std::locale imbue(const std::locale& loc)
+std::locale getloc() const
+```
+
+Sets or gets the locale.
+
+### narrow / widen
+
+```cpp
+char narrow(std::ostringstream::char_type c, char dfault) const
+std::ostringstream::char_type widen(char c) const
+```
+
+Narrows or widens characters.
+
+### flags
+
+```cpp
+std::ios::fmtflags flags() const
+std::ios::fmtflags flags(std::ios::fmtflags flags)
+```
+
+Gets or sets format flags.
+
+### setf / unsetf
+
+```cpp
+std::ios::fmtflags setf(std::ios::fmtflags flags)
+std::ios::fmtflags setf(std::ios::fmtflags flags, std::ios::fmtflags mask)
+void unsetf(std::ios::fmtflags flags)
+```
+
+Sets or unsets specific format flags.
+
+### precision
+
+```cpp
+std::streamsize precision() const
+std::streamsize precision(std::streamsize new_precision)
+```
+
+Gets or sets floating-point precision.
+
+### width
+
+```cpp
+std::streamsize width() const
+std::streamsize width(std::streamsize new_width)
+```
+
+Gets or sets field width.
+
+## Usage Examples
+
+### Basic Usage
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+  
+  // Create a row using RowStream
+  RowStream row1;
+  row1 << "Name" << "Age" << "City";
+  table.add_row(row1);
+  
+  // Or use directly in add_row
+  RowStream row2;
+  row2 << "Alice" << 25 << "New York";
+  table.add_row(row2);
+  
+  std::cout << table << std::endl;
+}
+```
+
+### Numeric Formatting
+
+```cpp
+Table financial;
+
+RowStream header;
+header << "Account" << "Balance" << "Interest Rate";
+financial.add_row(header);
+
+// Format numbers with precision
+RowStream data;
+data << "Savings";
+data << std::fixed << std::setprecision(2) << 12345.678;
+data << std::fixed << std::setprecision(2) << 2.5 << "%";
+financial.add_row(data);
+
+std::cout << financial << std::endl;
+```
+
+### Mixed Types
+
+```cpp
+Table metrics;
+
+RowStream row;
+row << "Server Load";  // string
+row << 87;              // integer
+row << 92.5;            // double
+row << true;            // boolean (displays as 1)
+row << "Active";        // string
+
+metrics.add_row(row);
+```
+
+### Dynamic Row Building
+
+```cpp
+Table report;
+
+// Build row dynamically based on conditions
+RowStream row;
+row << "Product A";
+
+int stock = 150;
+if (stock > 100) {
+  row << "In Stock" << stock;
+} else if (stock > 0) {
+  row << "Low Stock" << stock;
+} else {
+  row << "Out of Stock" << 0;
+}
+
+report.add_row(row);
+```
+
+### Nested Tables
+
+```cpp
+Table outer;
+
+// Create inner table
+Table inner;
+inner.add_row({"A", "B"});
+inner.add_row({"1", "2"});
+
+// Use RowStream to add nested table
+RowStream row;
+row << "Nested Table:" << inner;
+outer.add_row(row);
+
+std::cout << outer << std::endl;
+```
+
+### Custom Formatting with Manipulators
+
+```cpp
+Table scientific_data;
+
+RowStream header;
+header << "Measurement" << "Value" << "Error";
+scientific_data.add_row(header);
+
+RowStream data;
+data << "Speed of Light";
+
+// Use scientific notation
+data << std::scientific << std::setprecision(4) << 299792458.0;
+data << std::scientific << std::setprecision(2) << 0.0001;
+
+scientific_data.add_row(data);
+
+std::cout << scientific_data << std::endl;
+```
+
+### Building Multiple Rows in a Loop
+
+```cpp
+Table times_table;
+
+// Header
+RowStream header;
+header << "x";
+for (int i = 1; i <= 5; ++i) {
+  header << i;
+}
+times_table.add_row(header);
+
+// Data rows
+for (int i = 1; i <= 5; ++i) {
+  RowStream row;
+  row << i;  // First column
+  for (int j = 1; j <= 5; ++j) {
+    row << (i * j);
+  }
+  times_table.add_row(row);
+}
+
+std::cout << times_table << std::endl;
+```
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+#include <iomanip>
+using namespace tabulate;
+
+int main() {
+  Table sales_report;
+  
+  // Add header using RowStream
+  RowStream header;
+  header << "Product" << "Units Sold" << "Price" << "Revenue";
+  sales_report.add_row(header);
+  sales_report[0].format()
+    .font_style({FontStyle::bold})
+    .font_color(Color::yellow)
+    .font_align(FontAlign::center);
+  
+  // Add data rows with formatted numbers
+  struct Product {
+    std::string name;
+    int units;
+    double price;
+  };
+  
+  std::vector<Product> products = {
+    {"Laptop", 42, 999.99},
+    {"Mouse", 156, 29.99},
+    {"Keyboard", 89, 79.99},
+    {"Monitor", 31, 299.99}
+  };
+  
+  for (const auto& product : products) {
+    RowStream row;
+    row << product.name;
+    row << product.units;
+    row << "$" << std::fixed << std::setprecision(2) << product.price;
+    row << "$" << std::fixed << std::setprecision(2) 
+        << (product.units * product.price);
+    sales_report.add_row(row);
+  }
+  
+  // Format table
+  sales_report.column(0).format().width(15);
+  sales_report.column(1).format().width(12).font_align(FontAlign::center);
+  sales_report.column(2).format().width(10).font_align(FontAlign::right);
+  sales_report.column(3).format().width(12).font_align(FontAlign::right)
+    .font_color(Color::green);
+  
+  sales_report.format().border_color(Color::cyan);
+  
+  std::cout << sales_report << std::endl;
+  return 0;
+}
+```
+
+## Notes
+
+<Note>
+RowStream automatically converts non-string types to strings using `std::ostringstream`. This means you can use standard stream manipulators like `std::fixed`, `std::setprecision`, `std::hex`, etc.
+</Note>
+
+<Warning>
+Each value inserted into a RowStream becomes a separate cell in the table. If you want multiple values in a single cell, convert them to a string first.
+</Warning>

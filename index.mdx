@@ -1,97 +1,155 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Tabulate"
+description: "Table Maker for Modern C++"
 ---
 
-## Setting up
+<div className="text-center mb-12">
+  <h1 className="text-5xl font-bold mb-4" style={{color: '#040404'}}>
+    Beautiful Tables for Terminal Applications
+  </h1>
+  <p className="text-xl mb-8" style={{color: '#8a8a8a'}}>
+    A modern C++ library for creating beautifully formatted tables in the terminal with rich styling, colors, and export options
+  </p>
+</div>
 
-Get your documentation site up and running in minutes.
+## Get Started
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+Get up and running with Tabulate in minutes.
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
+<CardGroup cols={2}>
   <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
+    title="Quick Start"
+    icon="rocket"
+    href="/quickstart"
   >
-    Edit your docs locally and preview them in real time.
+    Create your first table in under 5 minutes
   </Card>
   <Card
-    title="Customize your site"
+    title="Installation"
+    icon="download"
+    href="/installation"
+  >
+    Add Tabulate to your C++ project
+  </Card>
+</CardGroup>
+
+## Key Features
+
+Everything you need to create stunning terminal tables.
+
+<CardGroup cols={2}>
+  <Card
+    title="Header-Only Library"
+    icon="file-code"
+  >
+    Just include the header and start using. Single-header option available for maximum convenience.
+  </Card>
+  <Card
+    title="Rich Formatting"
     icon="palette"
-    href="/essentials/settings"
   >
-    Customize the design and colors of your site to match your brand.
+    Complete control over alignment, colors, borders, font styles, and more.
   </Card>
-    <Card
-    title="Set up navigation"
+  <Card
+    title="UTF-8 Support"
+    icon="globe"
+  >
+    Full support for multi-byte characters and Unicode text.
+  </Card>
+  <Card
+    title="Export Formats"
+    icon="file-export"
+  >
+    Export tables to Markdown, AsciiDoc, and LaTeX formats.
+  </Card>
+  <Card
+    title="Nested Tables"
+    icon="table-cells"
+  >
+    Create complex layouts with tables inside tables.
+  </Card>
+  <Card
+    title="C++11 Compatible"
+    icon="check"
+  >
+    Works with C++11 and later, with optional C++17 enhancements.
+  </Card>
+</CardGroup>
+
+## Explore Documentation
+
+<CardGroup cols={3}>
+  <Card
+    title="Core Concepts"
+    icon="book"
+    href="/concepts/tables"
+  >
+    Learn the fundamentals of tables, formatting, and style inheritance
+  </Card>
+  <Card
+    title="Guides"
     icon="map"
-    href="/essentials/navigation"
+    href="/guides/alignment"
   >
-    Organize your docs to help users find what they need and succeed with your product.
+    Step-by-step guides for common tasks and features
   </Card>
   <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
+    title="API Reference"
     icon="code"
-    href="/essentials/code"
+    href="/api/table"
   >
-    Add sample code to demonstrate how to use your product.
+    Complete API documentation for all classes and methods
   </Card>
   <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
+    title="Advanced Features"
+    icon="wand-magic-sparkles"
+    href="/advanced/nested-tables"
   >
-    Display images and other media.
+    Nested tables, UTF-8, and export capabilities
   </Card>
   <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
+    title="Examples"
+    icon="lightbulb"
+    href="/examples/overview"
   >
-    Write once and reuse across your docs.
+    Real-world examples and use cases
   </Card>
-</Columns>
+  <Card
+    title="GitHub"
+    icon="github"
+    href="https://github.com/p-ranav/tabulate"
+  >
+    View source code and contribute
+  </Card>
+</CardGroup>
 
-## Need inspiration?
+## Quick Example
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  
+  movies.add_row({"Title", "Director", "Year"});
+  movies.add_row({"Blade Runner", "Ridley Scott", "1982"});
+  movies.add_row({"The Matrix", "Wachowskis", "1999"});
+  
+  // Format header
+  movies[0].format()
+    .font_color(Color::yellow)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::bold});
+  
+  // Center align year column
+  movies.column(2).format()
+    .font_align(FontAlign::center);
+  
+  std::cout << movies << std::endl;
+}
+```
+
+<Note>
+Tabulate is a header-only library with no external dependencies. Just include the header and start creating beautiful tables!
+</Note>

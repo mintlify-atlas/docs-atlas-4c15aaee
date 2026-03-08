@@ -1,0 +1,180 @@
+---
+title: Word Wrapping
+description: Control how text wraps within table cells using automatic or manual word wrapping
+---
+
+# Word Wrapping
+
+Tabulate supports both automatic and manual word-wrapping to control how text breaks within table cells. This ensures your content fits neatly within defined cell widths.
+
+## Automatic Word Wrapping
+
+When you set a cell width, Tabulate automatically wraps text that exceeds the specified width:
+
+```cpp
+table[0][0].format().width(20);
+```
+
+Long words that exceed the cell width will break and wrap to the next line.
+
+## Manual Word Wrapping
+
+You can override automatic wrapping by embedding newline characters (`\n`) in your cell content:
+
+```cpp
+table.add_row({"This paragraph \nhas embedded '\\n' \ncharacters and\n will break\n exactly where\n you want it\n to\n break."});
+```
+
+<Note>
+Automatic word-wrapping is used **only** if the cell contents do not have any embedded newline `\n` characters. If newlines are present, they take precedence.
+</Note>
+
+## Complete Example
+
+Here's an example demonstrating both automatic and manual word wrapping:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+
+  table.add_row({"This paragraph contains a veryveryveryveryveryverylong word. The long word will "
+                 "break and word wrap to the next line.",
+                 "This paragraph \nhas embedded '\\n' \ncharacters and\n will break\n exactly "
+                 "where\n you want it\n to\n break."});
+
+  table[0][0].format().width(20);
+  table[0][1].format().width(50);
+
+  std::cout << table << std::endl;
+}
+```
+
+### What's Happening
+
+<Steps>
+  <Step title="First column (automatic)">
+    The first cell has a width of 20 characters. The long word "veryveryveryveryveryverylong" automatically breaks and wraps to fit within the cell width.
+  </Step>
+  
+  <Step title="Second column (manual)">
+    The second cell has a width of 50 characters, which provides plenty of space. However, the embedded `\n` characters force line breaks at specific positions, regardless of available space.
+  </Step>
+</Steps>
+
+## Whitespace Trimming
+
+<Note>
+Regardless of whether word-wrapping is automatic or manual, Tabulate performs a trim operation on each line of each cell to remove whitespace characters from either side.
+</Note>
+
+This ensures consistent formatting and eliminates unintended spacing:
+
+```cpp
+// These are equivalent after trimming:
+table.add_row({"  Text with spaces  "});
+table.add_row({"Text with spaces"});
+```
+
+## Setting Cell Width
+
+Control the width of cells at different levels:
+
+<CodeGroup>
+```cpp cell-level
+// Set width for a specific cell
+table[0][0].format().width(30);
+```
+
+```cpp column-level
+// Set width for all cells in a column
+table.column(0).format().width(40);
+```
+
+```cpp row-level
+// Set width for all cells in a row
+table[0].format().width(25);
+```
+
+```cpp table-level
+// Set default width for all cells
+table.format().width(35);
+```
+</CodeGroup>
+
+## Handling Long Words
+
+When dealing with very long words or URLs:
+
+### Option 1: Let Automatic Wrapping Handle It
+
+```cpp
+table[0][0].format().width(20);
+// Long words will automatically break at the width limit
+```
+
+### Option 2: Insert Manual Breaks
+
+```cpp
+// Break a URL at meaningful points
+table.add_row({"https://github.com/\np-ranav/\ntabulate"});
+```
+
+### Option 3: Increase Cell Width
+
+```cpp
+// Provide more space
+table[0][0].format().width(50);
+```
+
+## Practical Patterns
+
+### Multi-line Headers
+
+Create descriptive headers with manual line breaks:
+
+```cpp
+table.add_row({"Employee\nID", "First\nName", "Last\nName", "Department /\nBusiness Unit"});
+```
+
+### Paragraphs in Cells
+
+For longer text content, set an appropriate width and let automatic wrapping do the work:
+
+```cpp
+table.add_row({"This is a longer paragraph that describes something in detail. "
+               "It will automatically wrap to multiple lines based on the cell width."});
+table[0][0].format().width(40);
+```
+
+### Fixed-Width Columns
+
+Ensure consistent column widths across your table:
+
+```cpp
+table.column(0).format().width(30);
+table.column(1).format().width(40);
+table.column(2).format().width(25);
+```
+
+<Tip>
+Combine word wrapping with text alignment for professional-looking tables. For example, use left alignment for text-heavy columns and right alignment for narrow numeric columns.
+</Tip>
+
+## Alignment with Word Wrapping
+
+Word wrapping works seamlessly with text alignment:
+
+```cpp
+table[0][0].format()
+  .width(30)
+  .font_align(FontAlign::center); // Wrapped text will be centered
+
+table[0][1].format()
+  .width(40)
+  .font_align(FontAlign::right);  // Wrapped text will be right-aligned
+```
+
+Each wrapped line respects the alignment setting, creating visually consistent multi-line cells.

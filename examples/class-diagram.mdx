@@ -1,0 +1,288 @@
+---
+title: UML Class Diagram Example
+description: Build complex nested table structures to create visual diagrams
+---
+
+This example demonstrates the power of nested tables in Tabulate by creating a UML class diagram. It showcases how tables can be embedded within other tables to create sophisticated visual structures.
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+using Row_t = Table::Row_t;
+
+int main() {
+  Table class_diagram;
+
+  // Global styling
+  class_diagram.format().font_style({FontStyle::bold}).font_align(FontAlign::center).width(60);
+
+  // Animal class
+  Table animal;
+  animal.add_row(Row_t{"Animal"});
+  animal[0].format().font_align(FontAlign::center);
+
+  // Animal properties nested table
+  Table animal_properties;
+  animal_properties.format().width(20);
+  animal_properties.add_row(Row_t{"+age: Int"});
+  animal_properties.add_row(Row_t{"+gender: String"});
+  animal_properties[1].format().hide_border_top();
+
+  // Animal methods nested table
+  Table animal_methods;
+  animal_methods.format().width(20);
+  animal_methods.add_row(Row_t{"+isMammal()"});
+  animal_methods.add_row(Row_t{"+mate()"});
+  animal_methods[1].format().hide_border_top();
+
+  animal.add_row(Row_t{animal_properties});
+  animal.add_row(Row_t{animal_methods});
+  animal[2].format().hide_border_top();
+
+  class_diagram.add_row(Row_t{animal});
+
+  // Add rows in the class diagram for the up-facing arrow
+  // Thanks to center alignment, these will align just fine
+  class_diagram.add_row(Row_t{"▲"});
+  class_diagram[1][0].format().hide_border_top().multi_byte_characters(true);
+  class_diagram.add_row(Row_t{"|"});
+  class_diagram[2].format().hide_border_top();
+  class_diagram.add_row(Row_t{"|"});
+  class_diagram[3].format().hide_border_top();
+
+  // Duck class
+  Table duck;
+  duck.add_row(Row_t{"Duck"});
+  duck[0].format().font_align(FontAlign::center);
+
+  // Duck properties nested table
+  Table duck_properties;
+  duck_properties.format().width(40);
+  duck_properties.add_row(Row_t{"+beakColor: String = \"yellow\""});
+
+  // Duck methods nested table
+  Table duck_methods;
+  duck_methods.format().width(40);
+  duck_methods.add_row(Row_t{"+swim()"});
+  duck_methods.add_row(Row_t{"+quack()"});
+  duck_methods[1].format().hide_border_top();
+
+  duck.add_row(Row_t{duck_properties});
+  duck.add_row(Row_t{duck_methods});
+  duck[2].format().hide_border_top();
+
+  class_diagram.add_row(Row_t{duck});
+  class_diagram[4].format().hide_border_top();
+
+  std::cout << class_diagram << std::endl;
+}
+```
+
+## Output
+
+The diagram will render like this:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                           Animal                           │
+├────────────────────────────────────────────────────────────┤
+│ +age: Int                                                  │
+│ +gender: String                                            │
+├────────────────────────────────────────────────────────────┤
+│ +isMammal()                                                │
+│ +mate()                                                    │
+└────────────────────────────────────────────────────────────┘
+                              ▲
+                              |
+                              |
+┌────────────────────────────────────────────────────────────┐
+│                            Duck                            │
+├────────────────────────────────────────────────────────────┤
+│ +beakColor: String = "yellow"                              │
+├────────────────────────────────────────────────────────────┤
+│ +swim()                                                    │
+│ +quack()                                                   │
+└────────────────────────────────────────────────────────────┘
+```
+
+## Key Concepts
+
+### Nested Table Structure
+
+The example creates multiple levels of nesting:
+
+1. **Main container**: `class_diagram` - holds everything
+2. **Class boxes**: `animal` and `duck` tables
+3. **Section tables**: `animal_properties`, `animal_methods`, `duck_properties`, `duck_methods`
+
+<CodeGroup>
+
+```cpp Creating Outer Table
+Table class_diagram;
+class_diagram.format()
+    .font_style({FontStyle::bold})
+    .font_align(FontAlign::center)
+    .width(60);
+```
+
+```cpp Creating Nested Table
+Table animal;
+animal.add_row(Row_t{"Animal"});
+
+// Add nested tables as rows
+animal.add_row(Row_t{animal_properties});
+animal.add_row(Row_t{animal_methods});
+```
+
+```cpp Adding to Parent
+class_diagram.add_row(Row_t{animal});
+```
+
+</CodeGroup>
+
+### Border Management
+
+To create seamless sections, borders are selectively hidden:
+
+```cpp
+// Hide top border to merge with previous row
+animal_properties[1].format().hide_border_top();
+animal_methods[1].format().hide_border_top();
+
+// Hide borders between class boxes and arrow
+class_diagram[1][0].format().hide_border_top();
+class_diagram[2].format().hide_border_top();
+class_diagram[3].format().hide_border_top();
+class_diagram[4].format().hide_border_top();
+```
+
+<Note>
+Hiding borders between related rows creates visual groupings and cleaner diagrams.
+</Note>
+
+### Unicode Characters
+
+The inheritance arrow uses Unicode characters:
+
+```cpp
+class_diagram.add_row(Row_t{"▲"});
+class_diagram[1][0].format()
+    .hide_border_top()
+    .multi_byte_characters(true);  // Important for Unicode!
+
+class_diagram.add_row(Row_t{"|"});
+```
+
+<Tip>
+Always set `multi_byte_characters(true)` when using Unicode symbols to ensure proper width calculation.
+</Tip>
+
+## Building Blocks
+
+### Class Header
+
+Each class starts with a centered header:
+
+```cpp
+Table animal;
+animal.add_row(Row_t{"Animal"});
+animal[0].format().font_align(FontAlign::center);
+```
+
+### Properties Section
+
+Properties are listed in a nested table:
+
+```cpp
+Table animal_properties;
+animal_properties.format().width(20);
+animal_properties.add_row(Row_t{"+age: Int"});
+animal_properties.add_row(Row_t{"+gender: String"});
+animal_properties[1].format().hide_border_top();
+```
+
+### Methods Section
+
+Methods follow the same pattern:
+
+```cpp
+Table animal_methods;
+animal_methods.format().width(20);
+animal_methods.add_row(Row_t{"+isMammal()"});
+animal_methods.add_row(Row_t{"+mate()"});
+animal_methods[1].format().hide_border_top();
+```
+
+## Extending the Example
+
+### Adding More Classes
+
+You can extend this to show multiple inheritance:
+
+```cpp
+Table mammal;
+mammal.add_row(Row_t{"Mammal"});
+// ... add properties and methods
+
+Table bird;
+bird.add_row(Row_t{"Bird"});
+// ... add properties and methods
+
+// Create horizontal layout
+Table subclasses;
+subclasses.add_row(Row_t{mammal, bird});
+class_diagram.add_row(Row_t{subclasses});
+```
+
+### Adding Relationships
+
+Show composition or aggregation:
+
+```cpp
+// Composition diamond
+class_diagram.add_row(Row_t{"◆─────"});
+class_diagram[5][0].format()
+    .hide_border_top()
+    .multi_byte_characters(true);
+```
+
+### Color Coding
+
+Differentiate class types with colors:
+
+```cpp
+// Interface - blue header
+animal[0].format()
+    .font_color(Color::blue)
+    .font_style({FontStyle::bold, FontStyle::italic});
+
+// Abstract class - green header
+duck[0].format()
+    .font_color(Color::green)
+    .font_style({FontStyle::bold});
+
+// Concrete class - default
+```
+
+## Use Cases
+
+This nested table technique is perfect for:
+
+- UML class diagrams
+- Organization charts
+- Flowcharts
+- Network topologies
+- Decision trees
+- Hierarchical data visualization
+
+<Tip>
+The key to complex diagrams is breaking them down into smaller table components, then assembling them with careful border management.
+</Tip>
+
+## Related Examples
+
+- [Movies Table](/examples/movies) - Column formatting and alignment
+- [Unicode Support](/examples/unicode) - Working with special characters
+- [Examples Overview](/examples/overview) - All available examples

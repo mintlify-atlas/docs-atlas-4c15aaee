@@ -1,0 +1,269 @@
+---
+title: Table Exporters
+description: Export your tables to Markdown, AsciiDoc, and LaTeX formats
+---
+
+Tabulate provides powerful exporters that allow you to convert your formatted tables into popular documentation and typesetting formats. This enables you to use Tabulate for terminal display while also generating content for documentation, websites, and academic papers.
+
+## Available Exporters
+
+Tabulate includes three exporters:
+
+- **MarkdownExporter**: Export to GitHub-flavored Markdown
+- **AsciiDocExporter**: Export to AsciiDoc format
+- **LatexExporter**: Export to LaTeX tabular environment
+
+## Markdown Export
+
+The `MarkdownExporter` converts tables to GitHub-flavored Markdown format, preserving column alignment.
+
+### Basic Usage
+
+```cpp
+#include <tabulate/markdown_exporter.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+  movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+  movies.add_row({"tt3263904", "Sully", "Clint Eastwood", "$60,000,000", "9 September 2016"});
+  movies.add_row({"tt1535109", "Captain Phillips", "Paul Greengrass", "$55,000,000", " 11 October 2013"});
+
+  // center align 'Director' column
+  movies.column(2).format().font_align(FontAlign::center);
+
+  // right align 'Estimated Budget' column
+  movies.column(3).format().font_align(FontAlign::right);
+
+  // right align 'Release Date' column
+  movies.column(4).format().font_align(FontAlign::right);
+
+  // Color header cells
+  for (size_t i = 0; i < 5; ++i) {
+    movies[0][i].format().font_color(Color::yellow).font_style({FontStyle::bold});
+  }
+
+  // Export to Markdown
+  MarkdownExporter exporter;
+  auto markdown = exporter.dump(movies);
+
+  std::cout << markdown << std::endl;
+}
+```
+
+<Note>
+The source code for this example is available at `samples/markdown_export.cpp` in the repository.
+</Note>
+
+### Markdown Output
+
+The exporter generates proper Markdown tables with alignment specifications:
+
+```markdown
+| S/N       | Movie Name       |     Director    | Estimated Budget |     Release Date |
+| :----     | :----            |      :---:      |            ----: |            ----: |
+| tt1979376 | Toy Story 4      |   Josh Cooley   |     $200,000,000 |     21 June 2019 |
+| tt3263904 | Sully            |  Clint Eastwood |      $60,000,000 | 9 September 2016 |
+| tt1535109 | Captain Phillips | Paul Greengrass |      $55,000,000 |  11 October 2013 |
+```
+
+### Markdown Alignment Rules
+
+<Warning>
+Unlike Tabulate, Markdown only supports per-column alignment, not per-cell alignment. The `MarkdownExporter` uses the formatting of header cells to determine column alignment. Columns are left-aligned by default if no alignment is specified.
+</Warning>
+
+The exporter translates alignment settings as follows:
+
+- `FontAlign::left` → `:----` (left-aligned)
+- `FontAlign::center` → `:---:` (center-aligned)
+- `FontAlign::right` → `----:` (right-aligned)
+
+## AsciiDoc Export
+
+The `AsciiDocExporter` converts tables to AsciiDoc format, preserving alignment and basic font styles (bold and italic).
+
+### Basic Usage
+
+```cpp
+#include <tabulate/asciidoc_exporter.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+  movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+  movies.add_row({"tt3263904", "Sully", "Clint Eastwood", "$60,000,000", "9 September 2016"});
+  movies.add_row({"tt1535109", "Captain Phillips", "Paul Greengrass", "$55,000,000", " 11 October 2013"});
+
+  // center align 'Director' column
+  movies.column(2).format().font_align(FontAlign::center);
+
+  // right align 'Estimated Budget' column
+  movies.column(3).format().font_align(FontAlign::right);
+
+  // right align 'Release Date' column
+  movies.column(4).format().font_align(FontAlign::right);
+
+  movies[1][2].format().font_style({FontStyle::bold, FontStyle::italic});
+  movies[2][1].format().font_style({FontStyle::italic});
+
+  // Color header cells
+  for (size_t i = 0; i < 5; ++i) {
+    movies[0][i]
+        .format()
+        .font_color(Color::white)
+        .font_style({FontStyle::bold})
+        .background_color(Color::blue);
+  }
+
+  AsciiDocExporter exporter;
+  auto asciidoc = exporter.dump(movies);
+
+  std::cout << asciidoc << std::endl;
+}
+```
+
+<Note>
+The source code for this example is available at `samples/asciidoc_export.cpp` in the repository.
+</Note>
+
+### AsciiDoc Output
+
+```asciidoc
+[cols="<,<,^,>,>"]
+|===
+|*S/N*|*Movie Name*|*Director*|*Estimated Budget*|*Release Date*
+
+|tt1979376|Toy Story 4|*_Josh Cooley_*|$200,000,000|21 June 2019
+|tt3263904|_Sully_|Clint Eastwood|$60,000,000|9 September 2016
+|tt1535109|Captain Phillips|Paul Greengrass|$55,000,000| 11 October 2013
+|===
+```
+
+### AsciiDoc Features
+
+<Steps>
+  <Step title="Column alignment">
+    Uses `[cols="<,<,^,>,>"]` syntax where `<` = left, `^` = center, `>` = right
+  </Step>
+  
+  <Step title="Font styles">
+    Supports `*bold*`, `_italic_`, and `*_bold italic_*` formatting
+  </Step>
+  
+  <Step title="Per-cell formatting">
+    Unlike Markdown, AsciiDoc supports formatting individual cells
+  </Step>
+</Steps>
+
+## LaTeX Export
+
+The `LatexExporter` generates LaTeX `tabular` environments suitable for academic papers and scientific documents.
+
+### Basic Usage
+
+```cpp
+#include <tabulate/latex_exporter.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+  movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+  movies.add_row({"tt3263904", "Sully", "Clint Eastwood", "$60,000,000", "9 September 2016"});
+  movies.add_row({"tt1535109", "Captain Phillips", "Paul Greengrass", "$55,000,000", " 11 October 2013"});
+
+  // center align 'Director' column
+  movies.column(2).format().font_align(FontAlign::center);
+
+  // right align 'Estimated Budget' column
+  movies.column(3).format().font_align(FontAlign::right);
+
+  // right align 'Release Date' column
+  movies.column(4).format().font_align(FontAlign::right);
+
+  LatexExporter exporter;
+  exporter.configure().indentation(8);
+  auto latex = exporter.dump(movies);
+
+  std::cout << latex << std::endl;
+}
+```
+
+<Note>
+The source code for this example is available at `samples/latex_export.cpp` in the repository.
+</Note>
+
+### LaTeX Output
+
+```latex
+\begin{tabular}
+{lclrr}
+        S/N & Movie Name & Director & Estimated Budget & Release Date \\
+        tt1979376 & Toy Story 4 & Josh Cooley & $200,000,000 & 21 June 2019 \\
+        tt3263904 & Sully & Clint Eastwood & $60,000,000 & 9 September 2016 \\
+        tt1535109 & Captain Phillips & Paul Greengrass & $55,000,000 &  11 October 2013 \\
+\end{tabular}
+```
+
+### LaTeX Configuration
+
+The `LatexExporter` supports configuration through the `ExportOptions` class:
+
+```cpp
+LatexExporter exporter;
+exporter.configure().indentation(4);  // Set row indentation
+```
+
+### LaTeX Alignment
+
+The exporter translates alignment settings to LaTeX column specifications:
+
+- `FontAlign::left` → `l` (left-aligned column)
+- `FontAlign::center` → `c` (center-aligned column)
+- `FontAlign::right` → `r` (right-aligned column)
+
+## Comparison Table
+
+| Feature | Markdown | AsciiDoc | LaTeX |
+|---------|----------|----------|-------|
+| Column Alignment | Yes | Yes | Yes |
+| Per-cell Alignment | No | No | No |
+| Bold/Italic | No | Yes | No |
+| Color Support | No | No | No |
+| Configuration | None | None | Indentation |
+| Use Case | Documentation | Technical docs | Academic papers |
+
+## Common Workflow
+
+<Steps>
+  <Step title="Design your table">
+    Create and format your table using Tabulate's full feature set
+  </Step>
+  
+  <Step title="Display in terminal">
+    Use `std::cout << table` for terminal output with colors and styles
+  </Step>
+  
+  <Step title="Export to documentation">
+    Use an exporter to generate Markdown/AsciiDoc/LaTeX for documentation
+  </Step>
+  
+  <Step title="Include in documents">
+    Copy the exported output into your documentation or LaTeX source files
+  </Step>
+</Steps>
+
+## Best Practices
+
+1. **Test both outputs**: Verify that your table looks good both in the terminal and in the exported format
+2. **Use header formatting**: Format header cells to ensure proper column alignment in exports
+3. **Keep it simple for exports**: Complex formatting like colors won't translate to all formats
+4. **Choose the right exporter**: Use Markdown for GitHub/docs, AsciiDoc for technical documentation, LaTeX for papers
+5. **Configure appropriately**: Use indentation settings for cleaner LaTeX output
+
+<Warning>
+Colors, most font styles, and complex borders are not preserved in exports. Exporters focus on structure and basic formatting only.
+</Warning>

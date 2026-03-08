@@ -1,0 +1,425 @@
+---
+title: Formatting Options
+description: Comprehensive guide to styling tables with the Format class
+---
+
+The `Format` class provides a fluent interface for styling tables, rows, columns, and cells. Call `.format()` on any table element to access formatting options.
+
+## Accessing Format Objects
+
+```cpp
+Table table;
+table.add_row({"Header 1", "Header 2"});
+
+// Table-level formatting
+table.format().font_style({FontStyle::bold});
+
+// Row-level formatting
+table[0].format().font_align(FontAlign::center);
+
+// Column-level formatting
+table.column(0).format().padding(2);
+
+// Cell-level formatting
+table[0][0].format().font_color(Color::red);
+```
+
+## Dimensions
+
+Control the width and height of table elements.
+
+### Width
+
+```cpp
+// Set cell width
+table[0][0].format().width(20);
+
+// Set width for entire column
+table.column(1).format().width(50);
+```
+
+<Note>
+When no width is specified, Tabulate automatically calculates column width based on the widest content in that column, including padding.
+</Note>
+
+### Height
+
+```cpp
+// Set cell height
+table[0][0].format().height(3);
+```
+
+## Padding
+
+Add space between cell borders and content.
+
+```cpp
+// Set all padding at once
+cell.format().padding(2);
+
+// Set individual sides
+cell.format()
+  .padding_left(2)
+  .padding_right(2)
+  .padding_top(1)
+  .padding_bottom(1);
+```
+
+**Default padding:** left = 1, right = 1, top = 0, bottom = 0
+
+## Font Alignment
+
+Align text within cells using `FontAlign`.
+
+```cpp
+Table movies;
+movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+
+// Center align the 'Director' column
+movies.column(2).format()
+  .font_align(FontAlign::center);
+
+// Right align the 'Estimated Budget' column
+movies.column(3).format()
+  .font_align(FontAlign::right);
+
+// Left align is the default
+movies.column(1).format()
+  .font_align(FontAlign::left);
+```
+
+**Available alignments:**
+- `FontAlign::left` (default)
+- `FontAlign::center`
+- `FontAlign::right`
+
+<Info>
+Alignment is calculated after padding is applied, so text aligns within the available content area.
+</Info>
+
+## Font Styles
+
+Apply text styling with `FontStyle`. Multiple styles can be combined.
+
+```cpp
+Table styled_table;
+styled_table.add_row({"Bold", "Italic", "Bold & Italic"});
+
+styled_table[0][0].format()
+  .font_style({FontStyle::bold});
+
+styled_table[0][1].format()
+  .font_style({FontStyle::italic});
+
+styled_table[0][2].format()
+  .font_style({FontStyle::bold, FontStyle::italic});
+```
+
+**Available font styles:**
+- `FontStyle::bold`
+- `FontStyle::dark`
+- `FontStyle::italic`
+- `FontStyle::underline`
+- `FontStyle::blink`
+- `FontStyle::reverse`
+- `FontStyle::concealed`
+- `FontStyle::crossed`
+
+<Tip>
+Pass multiple styles in a vector to combine them: `.font_style({FontStyle::bold, FontStyle::italic, FontStyle::underline})`
+</Tip>
+
+<Note>
+Font style availability depends on your terminal emulator. Some terminals may not support all styles.
+</Note>
+
+## Colors
+
+Set foreground and background colors for fonts, borders, and corners.
+
+### Font Colors
+
+```cpp
+// Set font (foreground) color
+cell.format().font_color(Color::red);
+
+// Set font background color
+cell.format().font_background_color(Color::yellow);
+```
+
+### Border Colors
+
+```cpp
+// Set all border colors at once
+cell.format()
+  .border_color(Color::blue)
+  .border_background_color(Color::cyan);
+
+// Set individual border colors
+cell.format()
+  .border_left_color(Color::red)
+  .border_right_color(Color::green)
+  .border_top_color(Color::blue)
+  .border_bottom_color(Color::yellow);
+```
+
+### Corner Colors
+
+```cpp
+// Set all corner colors
+cell.format()
+  .corner_color(Color::magenta)
+  .corner_background_color(Color::white);
+
+// Set individual corners
+cell.format()
+  .corner_top_left_color(Color::cyan)
+  .corner_top_right_color(Color::yellow)
+  .corner_bottom_left_color(Color::green)
+  .corner_bottom_right_color(Color::red);
+```
+
+### Universal Color Methods
+
+```cpp
+// Set foreground color for font, borders, and corners
+cell.format().color(Color::blue);
+
+// Set background color for font, borders, and corners
+cell.format().background_color(Color::yellow);
+```
+
+**Available colors:**
+- `Color::grey`
+- `Color::red`
+- `Color::green`
+- `Color::yellow`
+- `Color::blue`
+- `Color::magenta`
+- `Color::cyan`
+- `Color::white`
+- `Color::none` (default, no color)
+
+<Info>
+Color appearance varies depending on your terminal's color scheme and settings.
+</Info>
+
+## Borders
+
+Customize the characters used for table borders.
+
+```cpp
+// Set all borders at once
+table.format().border("-");
+
+// Set individual borders
+table.format()
+  .border_top("=")
+  .border_bottom("=")
+  .border_left("|")
+  .border_right("|");
+```
+
+### Show/Hide Borders
+
+```cpp
+// Show all borders
+table.format().show_border();
+
+// Hide all borders
+table.format().hide_border();
+
+// Show/hide individual borders
+table.format()
+  .show_border_top()
+  .hide_border_bottom()
+  .show_border_left()
+  .hide_border_right();
+```
+
+### Row Separators
+
+```cpp
+// Enable row separators between rows
+table.format().show_row_separator();
+```
+
+**Default borders:**
+- Top/Bottom: `"-"`
+- Left/Right: `"|"`
+
+## Corners
+
+Customize corner characters where borders meet.
+
+```cpp
+// Set all corners at once
+table.format().corner("+");
+
+// Set individual corners
+table.format()
+  .corner_top_left("┌")
+  .corner_top_right("┐")
+  .corner_bottom_left("└")
+  .corner_bottom_right("┘");
+```
+
+**Default corners:** `"+"`
+
+### Unicode Box Drawing
+
+```cpp
+Table table;
+table.add_row({"Fancy", "Table"});
+
+table.format()
+  .corner_top_left("╔")
+  .corner_top_right("╗")
+  .corner_bottom_left("╚")
+  .corner_bottom_right("╝")
+  .border_top("═")
+  .border_bottom("═")
+  .border_left("║")
+  .border_right("║");
+```
+
+<Tip>
+Use Unicode box-drawing characters for professional-looking tables. Remember to call `.multi_byte_characters(true)` when using Unicode.
+</Tip>
+
+## Column Separator
+
+Customize the character separating columns.
+
+```cpp
+table.format()
+  .column_separator("|")
+  .column_separator_color(Color::blue)
+  .column_separator_background_color(Color::white);
+```
+
+**Default:** `"|"`
+
+## Word Wrapping
+
+Tabulate automatically wraps text that exceeds the cell width.
+
+```cpp
+Table table;
+table.add_row({
+  "This paragraph contains a veryveryveryveryveryverylong word.",
+  "This paragraph \nhas embedded '\\n' \ncharacters"
+});
+
+table[0][0].format().width(20);  // Auto word-wrap enabled
+table[0][1].format().width(50);  // Manual breaks with \n
+```
+
+<Note>
+Automatic word-wrapping is used **only if** the cell contents don't have embedded newline `\n` characters. If you include `\n` in your text, Tabulate respects your manual line breaks.
+</Note>
+
+### How Word Wrapping Works
+
+1. Text is split on spaces, hyphens, and tabs
+2. Words are added to lines until the width limit is reached
+3. Long words that exceed the width are hyphenated
+4. Leading/trailing whitespace is trimmed from each line
+
+## Trim Mode
+
+Control whitespace trimming behavior.
+
+```cpp
+cell.format().trim_mode(Format::TrimMode::kBoth);    // Default
+cell.format().trim_mode(Format::TrimMode::kLeft);    // Trim left only
+cell.format().trim_mode(Format::TrimMode::kRight);   // Trim right only
+cell.format().trim_mode(Format::TrimMode::kNone);    // No trimming
+```
+
+**Available modes:**
+- `TrimMode::kBoth` - Trim whitespace from both ends (default)
+- `TrimMode::kLeft` - Trim from left end only
+- `TrimMode::kRight` - Trim from right end only
+- `TrimMode::kNone` - Don't trim whitespace
+
+## Multi-Byte Characters
+
+Enable support for Unicode and multi-byte character width calculation.
+
+```cpp
+Table table;
+table.add_row({"Language", "Phrase"});
+table.add_row({"Mandarin Chinese", "我爱你"});
+table.add_row({"Japanese", "愛してる"});
+table.add_row({"Korean", "사랑해 (Saranghae)"});
+
+// Enable multi-byte character support
+table.column(1).format()
+  .multi_byte_characters(true);
+```
+
+<Info>
+Multi-byte character support uses `wcswidth` to calculate display width. This is an opt-in feature because it's more computationally expensive than simple string length.
+</Info>
+
+### Locale Support
+
+Set explicit locale for character width calculation:
+
+```cpp
+// Set locale for a cell
+table[1][1].format().locale("zh_CN.UTF-8");  // Chinese
+
+// Set locale for a column
+table.column(1).format().locale("ja_JP.UTF-8");  // Japanese
+```
+
+<Note>
+Locale strings are system-specific. The same locale string may not work on all platforms. Not all locales may be available on your system.
+</Note>
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table universal_constants;
+  
+  universal_constants.add_row({"Quantity", "Value"});
+  universal_constants.add_row({"Speed of light in vacuum", "299 792 458 m·s⁻¹"});
+  universal_constants.add_row({"Planck's constant", "6.626 0693(11) × 10⁻³⁴ J·s"});
+  
+  // Table-level formatting
+  universal_constants.format()
+    .font_style({FontStyle::bold})
+    .border_top(" ")
+    .border_bottom(" ")
+    .border_left(" ")
+    .border_right(" ")
+    .corner(" ");
+  
+  // Format header row
+  universal_constants[0].format()
+    .padding_top(1)
+    .padding_bottom(1)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::underline})
+    .font_background_color(Color::red);
+  
+  // Format second column
+  universal_constants.column(1).format()
+    .font_color(Color::yellow);
+  
+  // Format specific cell
+  universal_constants[0][1].format()
+    .font_background_color(Color::blue)
+    .font_color(Color::white);
+  
+  std::cout << universal_constants << std::endl;
+}
+```
+
+This example demonstrates the fluent interface and how formatting can be applied at different levels of the table hierarchy.

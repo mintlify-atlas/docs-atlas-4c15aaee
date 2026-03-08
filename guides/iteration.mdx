@@ -1,0 +1,277 @@
+---
+title: Range-based Iteration
+description: Use range-based iteration to efficiently format rows, columns, and cells in your tables
+---
+
+# Range-based Iteration
+
+Hand-picking and formatting individual cells using `operator[]` can be tedious for large tables. Tabulate supports range-based iteration over tables, rows, and columns, making it easy to apply formatting to multiple cells efficiently.
+
+## Iteration Basics
+
+Tabulate supports C++ range-based for loops on three levels:
+
+- **Table iteration**: Iterate over all rows
+- **Row iteration**: Iterate over all cells in a row
+- **Column iteration**: Iterate over all cells in a column
+
+## Iterating Over Rows
+
+Iterate through all rows in a table:
+
+```cpp
+for (auto& row : table) {
+  row.format().font_style({FontStyle::bold});
+}
+```
+
+## Iterating Over Cells in a Row
+
+Iterate through cells in a specific row:
+
+```cpp
+// Iterate over cells in the first row (header)
+for (auto& cell : table[0]) {
+  cell.format()
+    .font_style({FontStyle::underline})
+    .font_align(FontAlign::center);
+}
+```
+
+## Iterating Over Cells in a Column
+
+Iterate through cells in a specific column:
+
+```cpp
+// Iterate over cells in the first column
+for (auto& cell : table.column(0)) {
+  if (cell.get_text() != "Company") {
+    cell.format().font_align(FontAlign::right);
+  }
+}
+```
+
+## Complete Example
+
+Here's a comprehensive example demonstrating multiple iteration patterns:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+
+  table.add_row({"Company", "Contact", "Country"});
+  table.add_row({"Alfreds Futterkiste", "Maria Anders", "Germany"});
+  table.add_row({"Centro comercial Moctezuma", "Francisco Chang", "Mexico"});
+  table.add_row({"Ernst Handel", "Roland Mendel", "Austria"});
+  table.add_row({"Island Trading", "Helen Bennett", "UK"});
+  table.add_row({"Laughing Bacchus Winecellars", "Yoshi Tannamuri", "Canada"});
+  table.add_row({"Magazzini Alimentari Riuniti", "Giovanni Rovelli", "Italy"});
+
+  // Set width of cells in each column
+  table.column(0).format().width(40);
+  table.column(1).format().width(30);
+  table.column(2).format().width(30);
+
+  // Iterate over cells in the first row
+  for (auto& cell : table[0]) {
+    cell.format()
+      .font_style({FontStyle::underline})
+      .font_align(FontAlign::center);
+  }
+
+  // Iterator over cells in the first column
+  for (auto& cell : table.column(0)) {
+    if (cell.get_text() != "Company") {
+      cell.format()
+        .font_align(FontAlign::right);
+    }
+  }
+
+  // Iterate over rows in the table
+  size_t index = 0;
+  for (auto& row : table) {
+    row.format()
+      .font_style({FontStyle::bold});
+
+    // Set blue background color for alternate rows
+    if (index > 0 && index % 2 == 0) {
+      for (auto& cell : row) {
+        cell.format()
+          .font_background_color(Color::blue);
+      }      
+    }
+    index += 1;
+  }
+
+  std::cout << table << std::endl;
+}
+```
+
+## Common Iteration Patterns
+
+### Format All Header Cells
+
+<CodeGroup>
+```cpp basic
+// Apply uniform formatting to header
+for (auto& cell : table[0]) {
+  cell.format()
+    .font_style({FontStyle::bold})
+    .font_align(FontAlign::center);
+}
+```
+
+```cpp with-index
+// Apply different formatting based on position
+size_t index = 0;
+for (auto& cell : table[0]) {
+  cell.format().font_style({FontStyle::bold});
+  if (index > 0) {
+    cell.format().font_align(FontAlign::center);
+  }
+  index++;
+}
+```
+</CodeGroup>
+
+### Zebra Striping (Alternating Row Colors)
+
+Create tables with alternating row background colors:
+
+```cpp
+size_t index = 0;
+for (auto& row : table) {
+  if (index > 0 && index % 2 == 0) {
+    for (auto& cell : row) {
+      cell.format().font_background_color(Color::blue);
+    }
+  }
+  index++;
+}
+```
+
+### Column-Specific Formatting
+
+Apply different formatting to each column:
+
+```cpp
+// Right-align numeric column
+for (auto& cell : table.column(3)) {
+  cell.format().font_align(FontAlign::right);
+}
+
+// Center-align name column
+for (auto& cell : table.column(1)) {
+  cell.format().font_align(FontAlign::center);
+}
+```
+
+### Conditional Formatting
+
+Format cells based on their content:
+
+```cpp
+for (auto& cell : table.column(0)) {
+  if (cell.get_text() != "Header") {
+    // Format data cells differently from header
+    cell.format().font_color(Color::green);
+  }
+}
+```
+
+## Advanced Patterns
+
+<Steps>
+  <Step title="Nested iteration">
+    Combine row and cell iteration for complete control:
+    
+    ```cpp
+    for (auto& row : table) {
+      for (auto& cell : row) {
+        cell.format().width(30);
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Skip header rows">
+    Process only data rows by tracking index:
+    
+    ```cpp
+    size_t row_index = 0;
+    for (auto& row : table) {
+      if (row_index > 0) {  // Skip header
+        row.format().font_style({FontStyle::italic});
+      }
+      row_index++;
+    }
+    ```
+  </Step>
+  
+  <Step title="Multi-level formatting">
+    Apply formatting at multiple levels for precedence:
+    
+    ```cpp
+    // Table-level default
+    for (auto& row : table) {
+      row.format().width(30);
+    }
+    
+    // Override for specific column
+    for (auto& cell : table.column(0)) {
+      cell.format().width(50);  // Overrides row default
+    }
+    ```
+  </Step>
+</Steps>
+
+## Getting Cell Text
+
+Access cell content during iteration using `.get_text()`:
+
+```cpp
+for (auto& cell : table.column(0)) {
+  std::string text = cell.get_text();
+  if (text == "Special") {
+    cell.format().font_color(Color::red);
+  }
+}
+```
+
+## Performance Tips
+
+<Tip>
+When applying the same formatting to multiple cells, use iteration instead of accessing cells individually. This is both more concise and easier to maintain.
+</Tip>
+
+### Instead of This (repetitive)
+
+```cpp
+table[0][0].format().font_style({FontStyle::bold});
+table[0][1].format().font_style({FontStyle::bold});
+table[0][2].format().font_style({FontStyle::bold});
+table[0][3].format().font_style({FontStyle::bold});
+```
+
+### Do This (iteration)
+
+```cpp
+for (auto& cell : table[0]) {
+  cell.format().font_style({FontStyle::bold});
+}
+```
+
+## Iteration Reference
+
+| What to Iterate | Syntax | Result |
+|----------------|--------|--------|
+| All rows | `for (auto& row : table)` | Iterates through each row |
+| Cells in row | `for (auto& cell : table[i])` | Iterates through cells in row `i` |
+| Cells in column | `for (auto& cell : table.column(i))` | Iterates through cells in column `i` |
+
+<Note>
+Iterators return references, allowing you to modify cells in-place. Changes made during iteration are immediately applied to the table.
+</Note>

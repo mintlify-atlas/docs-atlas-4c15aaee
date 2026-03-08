@@ -1,0 +1,254 @@
+---
+title: 'Table'
+description: 'Core table class for creating and managing tables'
+---
+
+## Overview
+
+The `Table` class is the main entry point for creating tables in Tabulate. It provides methods for adding rows, accessing cells, formatting, and printing tables.
+
+## Constructor
+
+```cpp
+Table()
+```
+
+Creates a new empty table.
+
+## Type Definitions
+
+### Row_t
+
+```cpp
+using Row_t = std::vector<variant<std::string, const char *, string_view, Table>>;
+```
+
+Represents a row of data that can contain strings, string views, or nested tables.
+
+## Methods
+
+### add_row
+
+```cpp
+Table& add_row(const Row_t& cells)
+```
+
+Adds a new row to the table.
+
+<ParamField path="cells" type="const Row_t&">
+  Vector of cell values. Each cell can be a string, const char*, string_view, or a nested Table.
+</ParamField>
+
+**Returns:** Reference to the table for method chaining.
+
+**Example:**
+```cpp
+using namespace tabulate;
+Table table;
+
+table.add_row({"Name", "Age", "City"});
+table.add_row({"Alice", "25", "New York"});
+```
+
+### operator[]
+
+```cpp
+Row& operator[](size_t index)
+```
+
+Accesses a row by index using bracket notation.
+
+<ParamField path="index" type="size_t">
+  Zero-based row index.
+</ParamField>
+
+**Returns:** Reference to the row at the specified index.
+
+**Example:**
+```cpp
+table.add_row({"Header 1", "Header 2"});
+table[0].format().font_color(Color::blue);
+```
+
+### row
+
+```cpp
+Row& row(size_t index)
+```
+
+Accesses a row by index.
+
+<ParamField path="index" type="size_t">
+  Zero-based row index.
+</ParamField>
+
+**Returns:** Reference to the row at the specified index.
+
+### column
+
+```cpp
+Column column(size_t index)
+```
+
+Accesses a column by index.
+
+<ParamField path="index" type="size_t">
+  Zero-based column index.
+</ParamField>
+
+**Returns:** Column object representing the specified column.
+
+**Example:**
+```cpp
+table.column(0).format().width(20).font_align(FontAlign::center);
+```
+
+### format
+
+```cpp
+Format& format()
+```
+
+Accesses the table's format settings.
+
+**Returns:** Reference to the table's Format object.
+
+**Example:**
+```cpp
+table.format()
+  .border_color(Color::yellow)
+  .font_color(Color::white)
+  .corner("+");
+```
+
+### print
+
+```cpp
+void print(std::ostream& stream)
+```
+
+Prints the table to an output stream.
+
+<ParamField path="stream" type="std::ostream&">
+  Output stream to write the table to.
+</ParamField>
+
+**Example:**
+```cpp
+table.print(std::cout);
+```
+
+### str
+
+```cpp
+std::string str()
+```
+
+Converts the table to a string representation.
+
+**Returns:** String containing the formatted table.
+
+**Example:**
+```cpp
+std::string table_output = table.str();
+```
+
+### size
+
+```cpp
+size_t size() const
+```
+
+Returns the number of rows in the table.
+
+**Returns:** Number of rows.
+
+### shape
+
+```cpp
+std::pair<size_t, size_t> shape()
+```
+
+Returns the dimensions of the table.
+
+**Returns:** Pair containing (number of rows, number of columns).
+
+**Example:**
+```cpp
+auto [rows, cols] = table.shape();
+std::cout << "Table has " << rows << " rows and " << cols << " columns" << std::endl;
+```
+
+## Iterators
+
+### begin / end
+
+```cpp
+auto begin() -> RowIterator
+auto end() -> RowIterator
+```
+
+Provides iteration over rows in the table.
+
+**Example:**
+```cpp
+for (auto& row : table) {
+  row.format().padding(1);
+}
+```
+
+## Stream Operator
+
+```cpp
+std::ostream& operator<<(std::ostream& stream, const Table& table)
+```
+
+Allows printing tables directly to output streams.
+
+**Example:**
+```cpp
+Table table;
+table.add_row({"Hello", "World"});
+std::cout << table << std::endl;
+```
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table employees;
+  
+  // Add header row
+  employees.add_row({"Name", "Age", "Department", "Salary"});
+  employees[0].format()
+    .font_color(Color::white)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::bold});
+  
+  // Add data rows
+  employees.add_row({"Alice Johnson", "28", "Engineering", "$95,000"});
+  employees.add_row({"Bob Smith", "35", "Marketing", "$80,000"});
+  employees.add_row({"Carol Davis", "42", "Management", "$120,000"});
+  
+  // Format columns
+  employees.column(0).format().width(20);
+  employees.column(1).format().width(8).font_align(FontAlign::center);
+  employees.column(2).format().width(15);
+  employees.column(3).format().width(12).font_align(FontAlign::right);
+  
+  // Format entire table
+  employees.format()
+    .border_color(Color::blue)
+    .corner("+")
+    .border_top("-")
+    .border_bottom("-")
+    .border_left("|")
+    .border_right("|");
+  
+  std::cout << employees << std::endl;
+  return 0;
+}
+```

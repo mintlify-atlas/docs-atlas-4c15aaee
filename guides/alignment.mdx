@@ -1,0 +1,116 @@
+---
+title: Font Alignment
+description: Learn how to align text in table cells using left, center, and right alignment options
+---
+
+# Font Alignment
+
+Tabulate supports three font alignment settings to control how text is positioned within table cells. By default, all table content is left-aligned.
+
+## Alignment Options
+
+You can align text in cells using the following options:
+
+- `FontAlign::left` - Align text to the left (default)
+- `FontAlign::center` - Center text horizontally
+- `FontAlign::right` - Align text to the right
+
+## Basic Usage
+
+Use `.format().font_align(alignment)` to set alignment for cells, rows, columns, or the entire table.
+
+```cpp
+// Center align a specific column
+table.column(2).format()
+  .font_align(FontAlign::center);
+
+// Right align a column
+table.column(3).format()
+  .font_align(FontAlign::right);
+```
+
+## Practical Example
+
+Here's a complete example showing how to align different columns in a movies table:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table movies;
+  movies.add_row({"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+  movies.add_row({"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+  movies.add_row({"tt3263904", "Sully", "Clint Eastwood", "$60,000,000", "9 September 2016"});
+  movies.add_row({"tt1535109", "Captain Phillips", "Paul Greengrass", "$55,000,000", " 11 October 2013"});
+
+  // center align 'Director' column
+  movies.column(2).format()
+    .font_align(FontAlign::center);
+
+  // right align 'Estimated Budget' column
+  movies.column(3).format()
+    .font_align(FontAlign::right);
+
+  // right align 'Release Date' column
+  movies.column(4).format()
+    .font_align(FontAlign::right);
+
+  // center-align and color header cells
+  for (size_t i = 0; i < 5; ++i) {
+    movies[0][i].format()
+      .font_color(Color::yellow)
+      .font_align(FontAlign::center)
+      .font_style({FontStyle::bold});
+  }
+
+  std::cout << movies << std::endl;
+}
+```
+
+<Note>
+Alignment follows the [style inheritance model](/concepts/style-inheritance). Cell-level alignment overrides row and column alignment, which in turn overrides table-level alignment.
+</Note>
+
+## Alignment Hierarchy
+
+<Steps>
+  <Step title="Column-level alignment">
+    Apply alignment to all cells in a column using `table.column(index).format().font_align(alignment)`
+  </Step>
+  
+  <Step title="Row-level alignment">
+    Apply alignment to all cells in a row using `table[row_index].format().font_align(alignment)`
+  </Step>
+  
+  <Step title="Cell-level alignment">
+    Override alignment for a specific cell using `table[row][col].format().font_align(alignment)`
+  </Step>
+</Steps>
+
+## Common Patterns
+
+### Header Row Centering
+
+A common pattern is to center-align header rows while keeping data rows left-aligned:
+
+```cpp
+// Center all header cells
+for (auto& cell : table[0]) {
+  cell.format().font_align(FontAlign::center);
+}
+```
+
+### Numeric Data
+
+For columns containing numeric data (like prices or dates), right alignment typically improves readability:
+
+```cpp
+// Right-align numeric columns
+table.column(3).format().font_align(FontAlign::right); // Budget
+table.column(4).format().font_align(FontAlign::right); // Date
+```
+
+<Tip>
+When working with tables containing numeric data, consider right-aligning those columns for better visual alignment of decimal points and numbers.
+</Tip>

@@ -1,0 +1,258 @@
+---
+title: Installation
+description: How to install and integrate Tabulate into your C++ project
+---
+
+# Installation
+
+Tabulate is a header-only library, making it incredibly easy to integrate into your C++ project. There are several ways to use Tabulate depending on your project setup.
+
+## Requirements
+
+<Note>
+  Tabulate requires C++11 or later. The library supports C++17 features like `std::variant` and `std::optional` when available.
+</Note>
+
+- **Minimum**: C++11 compiler
+- **Recommended**: C++17 or later for optimal performance
+- **Platform**: Cross-platform (Linux, macOS, Windows)
+
+## Installation Methods
+
+Choose the method that best fits your project:
+
+<Tabs>
+  <Tab title="Header-Only">
+    ### Header-Only Installation
+
+    The simplest way to use Tabulate is to include the library directly in your project.
+
+    <Steps>
+      <Step title="Clone the repository">
+        ```bash
+        git clone https://github.com/p-ranav/tabulate.git
+        ```
+      </Step>
+
+      <Step title="Add to include path">
+        Add the `include/` directory to your compiler's include path:
+
+        ```bash
+        g++ -std=c++11 -I/path/to/tabulate/include my_program.cpp -o my_program
+        ```
+      </Step>
+
+      <Step title="Include in your code">
+        ```cpp
+        #include <tabulate/table.hpp>
+        using namespace tabulate;
+
+        int main() {
+          Table my_table;
+          // Start using Tabulate!
+        }
+        ```
+      </Step>
+    </Steps>
+
+    <Note>
+      Just add `include/` to your `include_directories` and you're ready to go!
+    </Note>
+  </Tab>
+
+  <Tab title="Single Header">
+    ### Single Header Installation
+
+    For maximum convenience, Tabulate provides a single-header version that contains the entire library.
+
+    <Steps>
+      <Step title="Get the single header">
+        The single-header version is available in the `single_include/` directory of the repository.
+      </Step>
+
+      <Step title="Copy to your project">
+        ```bash
+        cp tabulate/single_include/tabulate.hpp your_project/include/
+        ```
+      </Step>
+
+      <Step title="Include and use">
+        ```cpp
+        #include "tabulate.hpp"
+        using namespace tabulate;
+        ```
+      </Step>
+    </Steps>
+
+    <Tip>
+      The single-header version is perfect for projects where you want to minimize dependencies or when you only need a single file.
+    </Tip>
+  </Tab>
+
+  <Tab title="CMake">
+    ### CMake Integration
+
+    For CMake-based projects, Tabulate provides full CMake support with modern targets.
+
+    <Steps>
+      <Step title="Add as subdirectory">
+        If you've cloned Tabulate into your project:
+
+        ```cmake
+        add_subdirectory(tabulate)
+        ```
+      </Step>
+
+      <Step title="Link against Tabulate">
+        ```cmake
+        target_link_libraries(your_target PRIVATE tabulate::tabulate)
+        ```
+      </Step>
+
+      <Step title="Configure C++ standard">
+        Tabulate automatically configures the required C++ standard, but you can explicitly choose:
+
+        ```cmake
+        # For C++17 support (recommended)
+        set(USE_CPP17 ON)
+        add_subdirectory(tabulate)
+
+        # For C++11 support
+        set(USE_CPP17 OFF)
+        add_subdirectory(tabulate)
+        ```
+      </Step>
+    </Steps>
+
+    ### Complete CMake Example
+
+    ```cmake CMakeLists.txt
+    cmake_minimum_required(VERSION 3.8)
+    project(my_project)
+
+    # Use C++17 (optional but recommended)
+    set(USE_CPP17 ON)
+
+    # Add Tabulate
+    add_subdirectory(external/tabulate)
+
+    # Create your executable
+    add_executable(my_app main.cpp)
+
+    # Link against Tabulate
+    target_link_libraries(my_app PRIVATE tabulate::tabulate)
+    ```
+
+    <Note>
+      When `USE_CPP17` is OFF, Tabulate uses [variant-lite](https://github.com/martinmoene/variant-lite) and [optional-lite](https://github.com/martinmoene/optional-lite) for C++11/14 compatibility.
+    </Note>
+  </Tab>
+
+  <Tab title="Install System-Wide">
+    ### System-Wide Installation
+
+    Install Tabulate system-wide using CMake:
+
+    <Steps>
+      <Step title="Build and install">
+        ```bash
+        git clone https://github.com/p-ranav/tabulate.git
+        cd tabulate
+        mkdir build && cd build
+        cmake ..
+        sudo cmake --install .
+        ```
+      </Step>
+
+      <Step title="Use find_package">
+        ```cmake
+        find_package(tabulate REQUIRED)
+        target_link_libraries(your_target PRIVATE tabulate::tabulate)
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Compiler Configuration
+
+### GCC / Clang
+
+```bash
+# C++11
+g++ -std=c++11 -I/path/to/tabulate/include main.cpp -o app
+
+# C++17 (recommended)
+g++ -std=c++17 -I/path/to/tabulate/include main.cpp -o app
+```
+
+### MSVC
+
+```bash
+# C++11
+cl /std:c++11 /I"path\to\tabulate\include" main.cpp
+
+# C++17
+cl /std:c++17 /I"path\to\tabulate\include" main.cpp
+```
+
+## Building Examples
+
+Tabulate includes numerous examples in the `samples/` directory. To build them:
+
+```bash
+mkdir build
+cd build
+cmake -DSAMPLES=ON -DUSE_CPP17=ON ..
+make
+```
+
+Then run any example:
+
+```bash
+./samples/movies
+./samples/colors
+./samples/unicode
+```
+
+<Tip>
+  Exploring the samples is a great way to learn Tabulate's features!
+</Tip>
+
+## Verification
+
+Verify your installation with this simple program:
+
+```cpp verify.cpp
+#include <iostream>
+#include <tabulate/table.hpp>
+
+using namespace tabulate;
+
+int main() {
+  Table test;
+  test.add_row({"Installation", "Successful!"});
+  
+  test[0].format()
+    .font_color(Color::green)
+    .font_style({FontStyle::bold});
+  
+  std::cout << test << std::endl;
+  return 0;
+}
+```
+
+Compile and run:
+
+```bash
+g++ -std=c++11 -I/path/to/tabulate/include verify.cpp -o verify
+./verify
+```
+
+You should see a formatted table with green, bold text!
+
+## Next Steps
+
+<Card title="Quick Start Guide" icon="rocket" href="/quickstart">
+  Now that Tabulate is installed, learn how to create your first table
+</Card>

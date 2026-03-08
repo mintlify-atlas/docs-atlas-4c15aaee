@@ -1,0 +1,545 @@
+---
+title: 'Format'
+description: 'Formatting options for tables, rows, columns, and cells'
+---
+
+## Overview
+
+The `Format` class provides a comprehensive set of methods for customizing the appearance of tables, rows, columns, and cells. All format methods return a reference to the Format object, enabling method chaining.
+
+## Dimensions
+
+### width
+
+```cpp
+Format& width(size_t value)
+```
+
+Sets the width of the element.
+
+<ParamField path="value" type="size_t">
+  The width in characters.
+</ParamField>
+
+**Example:**
+```cpp
+table[0][0].format().width(20);
+```
+
+### height
+
+```cpp
+Format& height(size_t value)
+```
+
+Sets the height of the element.
+
+<ParamField path="value" type="size_t">
+  The height in rows.
+</ParamField>
+
+## Padding
+
+### padding
+
+```cpp
+Format& padding(size_t value)
+```
+
+Sets padding on all sides (left, right, top, bottom).
+
+<ParamField path="value" type="size_t">
+  The padding value to apply to all sides.
+</ParamField>
+
+**Example:**
+```cpp
+table.format().padding(2);
+```
+
+### padding_left
+
+```cpp
+Format& padding_left(size_t value)
+```
+
+Sets left padding.
+
+### padding_right
+
+```cpp
+Format& padding_right(size_t value)
+```
+
+Sets right padding.
+
+### padding_top
+
+```cpp
+Format& padding_top(size_t value)
+```
+
+Sets top padding.
+
+### padding_bottom
+
+```cpp
+Format& padding_bottom(size_t value)
+```
+
+Sets bottom padding.
+
+## Borders
+
+### border
+
+```cpp
+Format& border(const std::string& value)
+```
+
+Sets all border characters (left, right, top, bottom).
+
+<ParamField path="value" type="const std::string&">
+  The character(s) to use for all borders.
+</ParamField>
+
+**Example:**
+```cpp
+table.format().border("*");
+```
+
+### border_left / border_right / border_top / border_bottom
+
+```cpp
+Format& border_left(const std::string& value)
+Format& border_right(const std::string& value)
+Format& border_top(const std::string& value)
+Format& border_bottom(const std::string& value)
+```
+
+Sets individual border characters.
+
+**Example:**
+```cpp
+table.format()
+  .border_left("|")
+  .border_right("|")
+  .border_top("-")
+  .border_bottom("-");
+```
+
+### Border Visibility
+
+```cpp
+Format& show_border()
+Format& hide_border()
+Format& show_border_top()
+Format& hide_border_top()
+Format& show_border_bottom()
+Format& hide_border_bottom()
+Format& show_border_left()
+Format& hide_border_left()
+Format& show_border_right()
+Format& hide_border_right()
+```
+
+Controls which borders are displayed.
+
+**Example:**
+```cpp
+table[0].format()
+  .hide_border_top()
+  .show_border_bottom();
+```
+
+### show_row_separator
+
+```cpp
+Format& show_row_separator()
+```
+
+Enables row separators between rows.
+
+## Border Colors
+
+### border_color
+
+```cpp
+Format& border_color(Color value)
+```
+
+Sets the color for all borders.
+
+<ParamField path="value" type="Color">
+  Color enum value: none, grey, red, green, yellow, blue, magenta, cyan, white.
+</ParamField>
+
+**Example:**
+```cpp
+table.format().border_color(Color::blue);
+```
+
+### border_background_color
+
+```cpp
+Format& border_background_color(Color value)
+```
+
+Sets the background color for all borders.
+
+### Individual Border Colors
+
+```cpp
+Format& border_left_color(Color value)
+Format& border_right_color(Color value)
+Format& border_top_color(Color value)
+Format& border_bottom_color(Color value)
+
+Format& border_left_background_color(Color value)
+Format& border_right_background_color(Color value)
+Format& border_top_background_color(Color value)
+Format& border_bottom_background_color(Color value)
+```
+
+Sets colors for individual borders.
+
+## Corners
+
+### corner
+
+```cpp
+Format& corner(const std::string& value)
+```
+
+Sets all corner characters.
+
+<ParamField path="value" type="const std::string&">
+  The character(s) to use for all corners.
+</ParamField>
+
+**Example:**
+```cpp
+table.format().corner("+");
+```
+
+### corner_color
+
+```cpp
+Format& corner_color(Color value)
+```
+
+Sets the color for all corners.
+
+### corner_background_color
+
+```cpp
+Format& corner_background_color(Color value)
+```
+
+Sets the background color for all corners.
+
+### Individual Corners
+
+```cpp
+Format& corner_top_left(const std::string& value)
+Format& corner_top_right(const std::string& value)
+Format& corner_bottom_left(const std::string& value)
+Format& corner_bottom_right(const std::string& value)
+
+Format& corner_top_left_color(Color value)
+Format& corner_top_right_color(Color value)
+Format& corner_bottom_left_color(Color value)
+Format& corner_bottom_right_color(Color value)
+
+Format& corner_top_left_background_color(Color value)
+Format& corner_top_right_background_color(Color value)
+Format& corner_bottom_left_background_color(Color value)
+Format& corner_bottom_right_background_color(Color value)
+```
+
+Sets individual corner characters and colors.
+
+## Column Separator
+
+### column_separator
+
+```cpp
+Format& column_separator(const std::string& value)
+```
+
+Sets the column separator character.
+
+<ParamField path="value" type="const std::string&">
+  The character(s) to use for column separation.
+</ParamField>
+
+### column_separator_color
+
+```cpp
+Format& column_separator_color(Color value)
+```
+
+Sets the column separator color.
+
+### column_separator_background_color
+
+```cpp
+Format& column_separator_background_color(Color value)
+```
+
+Sets the column separator background color.
+
+## Font Styling
+
+### font_align
+
+```cpp
+Format& font_align(FontAlign value)
+```
+
+Sets text alignment.
+
+<ParamField path="value" type="FontAlign">
+  Alignment enum: FontAlign::left, FontAlign::center, or FontAlign::right.
+</ParamField>
+
+**Example:**
+```cpp
+table[0].format().font_align(FontAlign::center);
+```
+
+### font_style
+
+```cpp
+Format& font_style(const std::vector<FontStyle>& style)
+```
+
+Sets font styles. Multiple styles can be combined.
+
+<ParamField path="style" type="const std::vector<FontStyle>&">
+  Vector of FontStyle enum values: bold, dark, italic, underline, blink, reverse, concealed, crossed.
+</ParamField>
+
+**Example:**
+```cpp
+table[0].format().font_style({FontStyle::bold, FontStyle::underline});
+```
+
+### font_color
+
+```cpp
+Format& font_color(Color value)
+```
+
+Sets the font color.
+
+<ParamField path="value" type="Color">
+  Color enum value.
+</ParamField>
+
+**Example:**
+```cpp
+table[0][0].format().font_color(Color::red);
+```
+
+### font_background_color
+
+```cpp
+Format& font_background_color(Color value)
+```
+
+Sets the font background color.
+
+## Convenience Methods
+
+### color
+
+```cpp
+Format& color(Color value)
+```
+
+Sets font color, border color, and corner color all at once.
+
+**Example:**
+```cpp
+table.format().color(Color::blue);
+```
+
+### background_color
+
+```cpp
+Format& background_color(Color value)
+```
+
+Sets font background color, border background color, and corner background color all at once.
+
+## Internationalization
+
+### multi_byte_characters
+
+```cpp
+Format& multi_byte_characters(bool value)
+```
+
+Enables or disables multi-byte character support for Unicode and international characters.
+
+<ParamField path="value" type="bool">
+  true to enable multi-byte character support, false to disable.
+</ParamField>
+
+**Example:**
+```cpp
+table[0][0].format().multi_byte_characters(true);
+```
+
+### locale
+
+```cpp
+Format& locale(const std::string& value)
+```
+
+Sets the locale for text processing.
+
+<ParamField path="value" type="const std::string&">
+  Locale string (e.g., "en_US.UTF-8").
+</ParamField>
+
+## Trim Mode
+
+### trim_mode
+
+```cpp
+Format& trim_mode(TrimMode trim_mode)
+```
+
+Controls whitespace trimming behavior.
+
+<ParamField path="trim_mode" type="TrimMode">
+  Enum value: TrimMode::kNone, TrimMode::kLeft, TrimMode::kRight, or TrimMode::kBoth.
+</ParamField>
+
+## Static Methods
+
+### word_wrap
+
+```cpp
+static std::string word_wrap(const std::string& str, size_t width, 
+                             const std::string& locale,
+                             bool is_multi_byte_character_support_enabled)
+```
+
+Applies word wrapping to a string.
+
+<ParamField path="str" type="const std::string&">
+  The input string to wrap.
+</ParamField>
+
+<ParamField path="width" type="size_t">
+  The maximum line width.
+</ParamField>
+
+<ParamField path="locale" type="const std::string&">
+  The locale for text processing.
+</ParamField>
+
+<ParamField path="is_multi_byte_character_support_enabled" type="bool">
+  Whether multi-byte character support is enabled.
+</ParamField>
+
+**Returns:** Word-wrapped string with newline characters inserted.
+
+### split_lines
+
+```cpp
+static std::vector<std::string> split_lines(const std::string& text, 
+                                            const std::string& delimiter,
+                                            const std::string& locale,
+                                            bool is_multi_byte_character_support_enabled)
+```
+
+Splits text into lines based on a delimiter.
+
+<ParamField path="text" type="const std::string&">
+  The input text to split.
+</ParamField>
+
+<ParamField path="delimiter" type="const std::string&">
+  The delimiter string to split on.
+</ParamField>
+
+**Returns:** Vector of string lines.
+
+### merge
+
+```cpp
+static Format merge(Format first, Format second)
+```
+
+Merges two Format objects, with the first having higher precedence.
+
+<ParamField path="first" type="Format">
+  Format with higher precedence (e.g., cell-level formatting).
+</ParamField>
+
+<ParamField path="second" type="Format">
+  Format with lower precedence (e.g., row-level formatting).
+</ParamField>
+
+**Returns:** Merged Format object.
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table styled_table;
+  
+  // Add data
+  styled_table.add_row({"Product", "Price", "Rating"});
+  styled_table.add_row({"Laptop", "$999", "4.5"});
+  styled_table.add_row({"Mouse", "$29", "4.8"});
+  styled_table.add_row({"Keyboard", "$79", "4.6"});
+  
+  // Format header row
+  styled_table[0].format()
+    .font_style({FontStyle::bold, FontStyle::underline})
+    .font_color(Color::yellow)
+    .font_background_color(Color::blue)
+    .font_align(FontAlign::center)
+    .padding(1);
+  
+  // Format data rows
+  for (size_t i = 1; i < styled_table.size(); ++i) {
+    styled_table[i].format().padding_left(2).padding_right(2);
+  }
+  
+  // Format columns
+  styled_table.column(0).format()
+    .width(15)
+    .font_align(FontAlign::left);
+  
+  styled_table.column(1).format()
+    .width(10)
+    .font_align(FontAlign::right)
+    .font_color(Color::green);
+  
+  styled_table.column(2).format()
+    .width(10)
+    .font_align(FontAlign::center);
+  
+  // Format entire table
+  styled_table.format()
+    .border_top("-")
+    .border_bottom("-")
+    .border_left("|")
+    .border_right("|")
+    .corner("+")
+    .border_color(Color::cyan)
+    .show_row_separator();
+  
+  std::cout << styled_table << std::endl;
+  return 0;
+}
+```

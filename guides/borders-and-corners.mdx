@@ -1,0 +1,227 @@
+---
+title: Borders and Corners
+description: Customize table borders and corners with different characters, colors, and styles
+---
+
+# Borders and Corners
+
+Tabulate provides fine-grained control over table borders and corners. You can customize the characters used, their colors, and background colors for each border and corner individually.
+
+## Setting Border Characters
+
+You can set custom characters for each border:
+
+```cpp
+table.format()
+  .border_top("-")
+  .border_bottom("-")
+  .border_left("|")
+  .border_right("|");
+```
+
+### Common Border Style
+
+To set all borders to the same character:
+
+```cpp
+table.format().border("+");
+```
+
+## Setting Corner Characters
+
+Customize each corner individually:
+
+```cpp
+table.format()
+  .corner_top_left("+")
+  .corner_top_right("+")
+  .corner_bottom_left("+")
+  .corner_bottom_right("+");
+```
+
+### Common Corner Style
+
+To set all corners to the same character:
+
+```cpp
+table.format().corner("+");
+```
+
+## Removing Borders
+
+You can create borderless tables by setting borders to spaces:
+
+```cpp
+table.format()
+  .border_top(" ")
+  .border_bottom(" ")
+  .border_left(" ")
+  .border_right(" ")
+  .corner(" ");
+```
+
+## Border and Corner Colors
+
+Tabulate allows you to color borders and corners with both foreground and background colors:
+
+<CodeGroup>
+```cpp foreground
+// Set border foreground colors
+table.format()
+  .border_left_color(Color::yellow)
+  .border_right_color(Color::green)
+  .border_top_color(Color::cyan)
+  .border_bottom_color(Color::red);
+```
+
+```cpp background
+// Set border background colors
+table.format()
+  .border_left_background_color(Color::red)
+  .border_right_background_color(Color::green)
+  .border_top_background_color(Color::blue)
+  .border_bottom_background_color(Color::yellow);
+```
+
+```cpp corners
+// Set corner colors
+table.format()
+  .corner_top_left_color(Color::cyan)
+  .corner_top_right_color(Color::yellow)
+  .corner_bottom_left_color(Color::green)
+  .corner_bottom_right_color(Color::red);
+```
+</CodeGroup>
+
+### Common Border Color
+
+Set a common color for all borders:
+
+```cpp
+table.format()
+  .border_color(Color::magenta)
+  .corner_color(Color::magenta);
+```
+
+## Multi-byte Characters
+
+<Note>
+When using multi-byte characters (like Unicode symbols or non-ASCII characters), you must enable multi-byte character support:
+</Note>
+
+```cpp
+table.format().multi_byte_characters(true);
+```
+
+This is an opt-in feature because calculating column width with multi-byte characters requires additional processing. You can set this at the table-level, row-level, or per-cell basis.
+
+## Advanced Example: Runic Table
+
+Here's a complete example using runic characters for borders and corners:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+
+  table.add_row({"ᛏᚺᛁᛊ ᛁᛊ ᚨ ᛊᛏᛟᚱy ᛟᚠᚨ ᛒᛖᚨᚱ ᚨᚾᛞ\n"
+                 "ᚨ ᚹᛟᛚᚠ, ᚹᚺᛟ ᚹᚨᚾᛞᛖᚱᛖᛞ ᛏᚺᛖ\n"
+                 "ᚱᛖᚨᛚᛗᛊ ᚾᛁᚾᛖ ᛏᛟ ᚠᚢᛚᚠᛁᛚᛚ ᚨ ᛈᚱᛟᛗᛁᛊᛖ\n"
+                 "ᛏᛟ ᛟᚾᛖ ᛒᛖᚠᛟᚱᛖ; ᛏᚺᛖy ᚹᚨᛚᚲ ᛏᚺᛖ\n"
+                 "ᛏᚹᛁᛚᛁᚷᚺᛏ ᛈᚨᛏᚺ, ᛞᛖᛊᛏᛁᚾᛖᛞ ᛏᛟ\n"
+                 "ᛞᛁᛊcᛟᚹᛖᚱ ᛏᚺᛖ ᛏᚱᚢᛏᚺ\nᛏᚺᚨᛏ ᛁᛊ ᛏᛟ cᛟᛗᛖ."});
+
+  table.format()
+      .multi_byte_characters(true)
+      // Font styling
+      .font_style({FontStyle::bold, FontStyle::dark})
+      .font_align(FontAlign::center)
+      .font_color(Color::red)
+      .font_background_color(Color::yellow)
+      // Corners
+      .corner_top_left("ᛰ")
+      .corner_top_right("ᛯ")
+      .corner_bottom_left("ᛮ")
+      .corner_bottom_right("ᛸ")
+      .corner_top_left_color(Color::cyan)
+      .corner_top_right_color(Color::yellow)
+      .corner_bottom_left_color(Color::green)
+      .corner_bottom_right_color(Color::red)
+      // Borders
+      .border_top("ᛜ")
+      .border_bottom("ᛜ")
+      .border_left("ᚿ")
+      .border_right("ᛆ")
+      .border_left_color(Color::yellow)
+      .border_right_color(Color::green)
+      .border_top_color(Color::cyan)
+      .border_bottom_color(Color::red);
+
+  std::cout << table << std::endl;
+}
+```
+
+## Customization Steps
+
+<Steps>
+  <Step title="Choose your characters">
+    Decide on the characters for borders and corners. You can use ASCII characters (`+`, `-`, `|`) or Unicode symbols.
+  </Step>
+  
+  <Step title="Enable multi-byte support if needed">
+    If using Unicode or other multi-byte characters, call `.multi_byte_characters(true)` on your format.
+  </Step>
+  
+  <Step title="Set border and corner characters">
+    Use `.border_*()` and `.corner_*()` methods to set your chosen characters.
+  </Step>
+  
+  <Step title="Apply colors">
+    Optionally apply colors using `.border_*_color()` and `.corner_*_color()` methods.
+  </Step>
+</Steps>
+
+## Common Border Styles
+
+### Minimalist Style
+
+```cpp
+table.format()
+  .border_top(" ")
+  .border_bottom(" ")
+  .border_left(" ")
+  .border_right(" ")
+  .corner(" ");
+```
+
+### Classic ASCII
+
+```cpp
+table.format()
+  .border_top("-")
+  .border_bottom("-")
+  .border_left("|")
+  .border_right("|")
+  .corner("+");
+```
+
+### Box Drawing Characters
+
+```cpp
+table.format()
+  .border_top("─")
+  .border_bottom("─")
+  .border_left("│")
+  .border_right("│")
+  .corner_top_left("┌")
+  .corner_top_right("┐")
+  .corner_bottom_left("└")
+  .corner_bottom_right("┘")
+  .multi_byte_characters(true);
+```
+
+<Tip>
+For consistent styling across your table, use the common `.border()`, `.border_color()`, and `.corner()` methods instead of setting each border and corner individually.
+</Tip>

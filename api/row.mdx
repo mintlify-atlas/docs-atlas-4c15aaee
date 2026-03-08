@@ -1,0 +1,213 @@
+---
+title: 'Row'
+description: 'Class for accessing and formatting table rows'
+---
+
+## Overview
+
+The `Row` class represents a single row in a table. It provides methods for accessing individual cells and applying formatting to the entire row.
+
+## Constructor
+
+<Note>
+Row objects are typically created internally by the Table class. Users access rows through `Table::operator[]` or `Table::row()`.
+</Note>
+
+## Methods
+
+### operator[]
+
+```cpp
+Cell& operator[](size_t index)
+```
+
+Accesses a cell in the row by index using bracket notation.
+
+<ParamField path="index" type="size_t">
+  Zero-based column index.
+</ParamField>
+
+**Returns:** Reference to the cell at the specified column index.
+
+**Example:**
+```cpp
+table.add_row({"Name", "Age", "City"});
+table[0][1].format().font_color(Color::blue);
+```
+
+### cell
+
+```cpp
+Cell& cell(size_t index)
+```
+
+Accesses a cell in the row by index.
+
+<ParamField path="index" type="size_t">
+  Zero-based column index.
+</ParamField>
+
+**Returns:** Reference to the cell at the specified column index.
+
+### cells
+
+```cpp
+std::vector<std::shared_ptr<Cell>> cells() const
+```
+
+Returns all cells in the row.
+
+**Returns:** Vector of shared pointers to Cell objects.
+
+### size
+
+```cpp
+size_t size() const
+```
+
+Returns the number of cells in the row.
+
+**Returns:** Number of cells (columns) in the row.
+
+### format
+
+```cpp
+Format& format()
+```
+
+Accesses the row's format settings. Formatting applied to a row affects all cells in that row.
+
+**Returns:** Reference to the row's Format object.
+
+**Example:**
+```cpp
+table.add_row({"Header 1", "Header 2", "Header 3"});
+table[0].format()
+  .font_color(Color::white)
+  .font_align(FontAlign::center)
+  .font_style({FontStyle::bold});
+```
+
+## Iterators
+
+### begin / end
+
+```cpp
+auto begin() -> CellIterator
+auto end() -> CellIterator
+```
+
+Provides iteration over cells in the row.
+
+**Example:**
+```cpp
+for (auto& cell : table[0]) {
+  cell.format().padding(2);
+}
+```
+
+## Usage Examples
+
+### Formatting Header Rows
+
+```cpp
+Table table;
+table.add_row({"Product", "Price", "Stock"});
+
+// Format the entire header row
+table[0].format()
+  .font_color(Color::yellow)
+  .font_style({FontStyle::bold, FontStyle::underline})
+  .font_align(FontAlign::center)
+  .background_color(Color::blue);
+```
+
+### Accessing Individual Cells
+
+```cpp
+table.add_row({"Laptop", "$999", "15"});
+table.add_row({"Mouse", "$29", "150"});
+
+// Format specific cells in a row
+table[1][0].format().font_style({FontStyle::bold});
+table[1][1].format().font_color(Color::green);
+```
+
+### Iterating Through Cells
+
+```cpp
+table.add_row({"Data 1", "Data 2", "Data 3"});
+
+// Apply formatting to all cells in a row
+for (auto& cell : table[1]) {
+  cell.format()
+    .padding_left(2)
+    .padding_right(2);
+}
+```
+
+### Alternating Row Colors
+
+```cpp
+Table table;
+table.add_row({"Name", "Score"});
+table.add_row({"Alice", "95"});
+table.add_row({"Bob", "87"});
+table.add_row({"Carol", "92"});
+table.add_row({"David", "88"});
+
+// Color alternate rows
+for (size_t i = 1; i < table.size(); ++i) {
+  if (i % 2 == 0) {
+    table[i].format().background_color(Color::grey);
+  }
+}
+```
+
+### Hiding Borders for Specific Rows
+
+```cpp
+Table table;
+table.add_row({"Section Header"});
+table[0].format()
+  .hide_border_top()
+  .font_style({FontStyle::bold});
+
+table.add_row({"Content goes here"});
+table[1].format().hide_border_bottom();
+```
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table report;
+  
+  // Add and format header row
+  report.add_row({"Quarter", "Revenue", "Expenses", "Profit"});
+  report[0].format()
+    .font_color(Color::white)
+    .font_background_color(Color::blue)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::bold});
+  
+  // Add data rows
+  report.add_row({"Q1", "$250,000", "$180,000", "$70,000"});
+  report.add_row({"Q2", "$280,000", "$195,000", "$85,000"});
+  report.add_row({"Q3", "$310,000", "$210,000", "$100,000"});
+  report.add_row({"Q4", "$340,000", "$225,000", "$115,000"});
+  
+  // Add total row with special formatting
+  report.add_row({"Total", "$1,180,000", "$810,000", "$370,000"});
+  report[5].format()
+    .font_style({FontStyle::bold})
+    .font_color(Color::green)
+    .border_top("-");
+  
+  std::cout << report << std::endl;
+  return 0;
+}
+```

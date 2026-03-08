@@ -1,0 +1,167 @@
+---
+title: Examples Overview
+description: Explore practical examples of Tabulate in action
+---
+
+Tabulate provides a powerful and flexible way to create formatted tables in C++. This section showcases various examples demonstrating different features and use cases.
+
+## Quick Start Examples
+
+### Basic Table Formatting
+
+The most common use case is creating a simple formatted table with headers and data:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+using Row_t = Table::Row_t;
+
+int main() {
+  Table colors;
+
+  colors.add_row(Row_t{"Font Color is Red", "Font Color is Blue", "Font Color is Green"});
+  colors.add_row(Row_t{"Everything is Red", "Everything is Blue", "Everything is Green"});
+  colors.add_row(
+      Row_t{"Font Background is Red", "Font Background is Blue", "Font Background is Green"});
+
+  colors[0][0].format().font_color(Color::red).font_style({FontStyle::bold});
+  colors[0][1].format().font_color(Color::blue).font_style({FontStyle::bold});
+  colors[0][2].format().font_color(Color::green).font_style({FontStyle::bold});
+
+  colors[2][0].format().font_background_color(Color::red).font_style({FontStyle::bold});
+  colors[2][1].format().font_background_color(Color::blue).font_style({FontStyle::bold});
+  colors[2][2].format().font_background_color(Color::green).font_style({FontStyle::bold});
+
+  std::cout << colors << std::endl;
+}
+```
+
+<Note>
+Font colors, background colors, and borders can all be customized independently for each cell.
+</Note>
+
+### Font Styles
+
+Tabulate supports various font styles that can be combined:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+using Row_t = Table::Row_t;
+
+int main() {
+  Table styled_table;
+  styled_table.add_row(Row_t{"Bold", "Italic", "Bold & Italic", "Blinking"});
+  styled_table.add_row(Row_t{"Underline", "Crossed", "Dark", "Bold, Italic & Underlined"});
+
+  styled_table[0][0].format().font_style({FontStyle::bold});
+  styled_table[0][1].format().font_style({FontStyle::italic});
+  styled_table[0][2].format().font_style({FontStyle::bold, FontStyle::italic});
+  styled_table[0][3].format().font_style({FontStyle::blink});
+
+  styled_table[1][0].format().font_style({FontStyle::underline});
+  styled_table[1][1].format().font_style({FontStyle::crossed});
+  styled_table[1][2].format().font_style({FontStyle::dark});
+  styled_table[1][3].format().font_style(
+      {FontStyle::bold, FontStyle::italic, FontStyle::underline});
+
+  std::cout << styled_table << std::endl;
+}
+```
+
+<Tip>
+Multiple font styles can be combined by passing them in an initializer list to `font_style()`.
+</Tip>
+
+### Word Wrapping
+
+Tabulate automatically handles word wrapping based on column width:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+using Row_t = Table::Row_t;
+
+int main() {
+  Table table;
+
+  table.add_row(Row_t{"This paragraph contains a veryveryveryveryveryverylong "
+                      "word. The long word will "
+                      "break and word wrap to the next line.",
+                      "This paragraph \nhas embedded '\\n' \ncharacters and\n "
+                      "will break\n exactly "
+                      "where\n you want it\n to\n break."});
+
+  table[0][0].format().width(20);
+  table[0][1].format().width(50);
+
+  std::cout << table << std::endl;
+}
+```
+
+## Featured Examples
+
+### Movies Database Table
+
+Learn how to create a properly formatted database-style table with column alignment and header styling.
+
+[View Movies Example →](/examples/movies)
+
+### UML Class Diagram
+
+Discover how to create nested tables to build complex visualizations like UML class diagrams.
+
+[View Class Diagram Example →](/examples/class-diagram)
+
+### Unicode Support
+
+See how Tabulate handles multi-byte Unicode characters from various languages and scripts.
+
+[View Unicode Example →](/examples/unicode)
+
+## Export Formats
+
+### Markdown Export
+
+Export your tables to Markdown format:
+
+```cpp
+#include <tabulate/markdown_exporter.hpp>
+using namespace tabulate;
+using Row_t = Table::Row_t;
+
+int main() {
+  Table movies;
+  movies.add_row(Row_t{"S/N", "Movie Name", "Director", "Estimated Budget", "Release Date"});
+  movies.add_row(Row_t{"tt1979376", "Toy Story 4", "Josh Cooley", "$200,000,000", "21 June 2019"});
+  movies.add_row(Row_t{"tt3263904", "Sully", "Clint Eastwood", "$60,000,000", "9 September 2016"});
+
+  MarkdownExporter exporter;
+  auto markdown = exporter.dump(movies);
+
+  std::cout << markdown << std::endl;
+}
+```
+
+**Output:**
+
+```markdown
+| S/N | Movie Name | Director | Estimated Budget | Release Date |
+| --- | --- | --- | --- | --- |
+| tt1979376 | Toy Story 4 | Josh Cooley | $200,000,000 | 21 June 2019 |
+| tt3263904 | Sully | Clint Eastwood | $60,000,000 | 9 September 2016 |
+```
+
+<Note>
+Tabulate also supports exporting to LaTeX and AsciiDoc formats. See the API Reference for more details.
+</Note>
+
+## Next Steps
+
+Explore the detailed examples to learn more about:
+
+- Aligning content within cells
+- Customizing borders and corners
+- Creating nested table structures
+- Working with Unicode characters
+- Exporting tables to different formats

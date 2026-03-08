@@ -1,0 +1,220 @@
+---
+title: Colors and Styles
+description: Apply colors and font styles to make your tables visually appealing
+---
+
+# Colors and Styles
+
+Tabulate provides extensive color and styling options to make your tables visually appealing. You can apply colors to fonts, backgrounds, borders, and corners.
+
+## Available Colors
+
+Thanks to [termcolor](https://github.com/ikalnytskyi/termcolor), Tabulate supports 8 colors:
+
+- `Color::grey`
+- `Color::red`
+- `Color::green`
+- `Color::yellow`
+- `Color::blue`
+- `Color::magenta`
+- `Color::cyan`
+- `Color::white`
+
+<Note>
+The appearance of these colors varies depending on your terminal and color scheme.
+</Note>
+
+## Font Colors
+
+You can set both foreground (text) and background colors for font:
+
+```cpp
+// Set font color (foreground)
+cell.format().font_color(Color::red);
+
+// Set font background color
+cell.format().font_background_color(Color::yellow);
+```
+
+## Complete Color Example
+
+Here's a comprehensive example demonstrating various color applications:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table colors;
+
+  colors.add_row({"Font Color is Red", "Font Color is Blue", "Font Color is Green"});
+  colors.add_row({"Everything is Red", "Everything is Blue", "Everything is Green"});
+  colors.add_row({"Font Background is Red", "Font Background is Blue", "Font Background is Green"});
+
+  // First row: Font colors only
+  colors[0][0].format()
+    .font_color(Color::red)
+    .font_style({FontStyle::bold});
+  colors[0][1].format()
+    .font_color(Color::blue)
+    .font_style({FontStyle::bold});
+  colors[0][2].format()
+    .font_color(Color::green)
+    .font_style({FontStyle::bold});
+
+  // Second row: Everything colored (font, background, borders)
+  colors[1][0].format()
+    .border_left_color(Color::red)
+    .border_left_background_color(Color::red)
+    .font_background_color(Color::red)
+    .font_color(Color::red);
+
+  colors[1][1].format()
+    .border_left_color(Color::blue)
+    .border_left_background_color(Color::blue)
+    .font_background_color(Color::blue)
+    .font_color(Color::blue);
+
+  colors[1][2].format()
+    .border_left_color(Color::green)
+    .border_left_background_color(Color::green)
+    .font_background_color(Color::green)
+    .font_color(Color::green)
+    .border_right_color(Color::green)
+    .border_right_background_color(Color::green);
+
+  // Third row: Background colors only
+  colors[2][0].format()
+    .font_background_color(Color::red)
+    .font_style({FontStyle::bold});
+  colors[2][1].format()
+    .font_background_color(Color::blue)
+    .font_style({FontStyle::bold});
+  colors[2][2].format()
+    .font_background_color(Color::green)
+    .font_style({FontStyle::bold});
+
+  std::cout << colors << std::endl;
+}
+```
+
+## Font Styles
+
+Tabulate supports 8 font styles:
+
+<CodeGroup>
+```cpp bold
+cell.format().font_style({FontStyle::bold});
+```
+
+```cpp italic
+cell.format().font_style({FontStyle::italic});
+```
+
+```cpp underline
+cell.format().font_style({FontStyle::underline});
+```
+
+```cpp multiple
+// Combine multiple styles
+cell.format().font_style({FontStyle::bold, FontStyle::italic, FontStyle::underline});
+```
+</CodeGroup>
+
+### Available Styles
+
+- `FontStyle::bold` - Bold text
+- `FontStyle::dark` - Darker/dimmed text
+- `FontStyle::italic` - Italic text
+- `FontStyle::underline` - Underlined text
+- `FontStyle::blink` - Blinking text
+- `FontStyle::reverse` - Reversed foreground/background
+- `FontStyle::concealed` - Hidden text
+- `FontStyle::crossed` - Strikethrough text
+
+<Note>
+Depending on your terminal and terminal settings, some font styles might not render correctly or at all.
+</Note>
+
+## Combining Styles
+
+The `font_style` method takes a vector, allowing you to apply multiple styles simultaneously:
+
+```cpp
+// Bold and italic
+cell.format().font_style({FontStyle::bold, FontStyle::italic});
+
+// Bold, italic, and underlined
+cell.format().font_style({FontStyle::bold, FontStyle::italic, FontStyle::underline});
+```
+
+## Border and Corner Colors
+
+You can color individual borders and corners:
+
+<Steps>
+  <Step title="Set border colors">
+    ```cpp
+    table.format()
+      .border_left_color(Color::yellow)
+      .border_right_color(Color::green)
+      .border_top_color(Color::cyan)
+      .border_bottom_color(Color::red);
+    ```
+  </Step>
+  
+  <Step title="Set corner colors">
+    ```cpp
+    table.format()
+      .corner_top_left_color(Color::cyan)
+      .corner_top_right_color(Color::yellow)
+      .corner_bottom_left_color(Color::green)
+      .corner_bottom_right_color(Color::red);
+    ```
+  </Step>
+</Steps>
+
+## Common Styling Patterns
+
+### Styled Headers
+
+A common pattern is to style header rows with bold, colored text:
+
+```cpp
+// Style header row
+for (size_t i = 0; i < column_count; ++i) {
+  table[0][i].format()
+    .font_color(Color::yellow)
+    .font_align(FontAlign::center)
+    .font_style({FontStyle::bold});
+}
+```
+
+### Alternating Row Colors
+
+Create zebra-striped tables for better readability:
+
+```cpp
+for (size_t i = 1; i < table.size(); ++i) {
+  if (i % 2 == 0) {
+    for (auto& cell : table[i]) {
+      cell.format().font_background_color(Color::blue);
+    }
+  }
+}
+```
+
+<Tip>
+Font styles are applied to the entire cell. Unlike HTML, you cannot apply styles to specific words within a cell.
+</Tip>
+
+## Color Application Hierarchy
+
+Colors follow the style inheritance model:
+
+1. Cell formatting (highest priority)
+2. Row formatting
+3. Column formatting
+4. Table formatting (lowest priority)
+
+This allows you to override table-wide colors for specific cells, rows, or columns.

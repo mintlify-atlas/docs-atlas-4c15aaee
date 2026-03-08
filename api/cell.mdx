@@ -1,0 +1,270 @@
+---
+title: 'Cell'
+description: 'Class for individual table cells'
+---
+
+## Overview
+
+The `Cell` class represents a single cell in a table. It stores the cell's text content and provides methods for accessing and formatting the cell.
+
+## Constructor
+
+<Note>
+Cell objects are created internally by the Table class. Users access cells through `Row::operator[]` or `Column::operator[]`.
+</Note>
+
+## Methods
+
+### set_text
+
+```cpp
+void set_text(const std::string& text)
+```
+
+Sets the text content of the cell.
+
+<ParamField path="text" type="const std::string&">
+  The text content to set for the cell.
+</ParamField>
+
+**Example:**
+```cpp
+table.add_row({"Name", "Age"});
+table[0][0].set_text("Full Name");
+```
+
+### get_text
+
+```cpp
+const std::string& get_text()
+```
+
+Returns the text content of the cell.
+
+**Returns:** Reference to the cell's text content.
+
+**Example:**
+```cpp
+std::string cell_content = table[0][0].get_text();
+std::cout << "Cell contains: " << cell_content << std::endl;
+```
+
+### size
+
+```cpp
+size_t size()
+```
+
+Returns the size of the cell's content, accounting for locale and multi-byte character support.
+
+**Returns:** The display width of the cell's content.
+
+<Note>
+This method respects the cell's locale settings and multi-byte character support when calculating the size.
+</Note>
+
+### locale
+
+```cpp
+std::string locale()
+```
+
+Returns the locale setting for the cell.
+
+**Returns:** The locale string for the cell.
+
+### format
+
+```cpp
+Format& format()
+```
+
+Accesses the cell's format settings.
+
+**Returns:** Reference to the cell's Format object.
+
+**Example:**
+```cpp
+table[0][0].format()
+  .font_color(Color::blue)
+  .font_style({FontStyle::bold})
+  .width(20);
+```
+
+### is_multi_byte_character_support_enabled
+
+```cpp
+bool is_multi_byte_character_support_enabled()
+```
+
+Checks if multi-byte character support is enabled for the cell.
+
+**Returns:** `true` if multi-byte character support is enabled, `false` otherwise.
+
+## Usage Examples
+
+### Setting Cell Content
+
+```cpp
+Table table;
+table.add_row({"Product", "Price"});
+
+// Modify cell content after creation
+table[0][0].set_text("Product Name");
+table[0][1].set_text("Price (USD)");
+```
+
+### Formatting Individual Cells
+
+```cpp
+Table grades;
+grades.add_row({"Student", "Math", "Science", "English"});
+grades.add_row({"Alice", "95", "88", "92"});
+grades.add_row({"Bob", "78", "92", "85"});
+
+// Format header cells
+for (size_t i = 0; i < 4; ++i) {
+  grades[0][i].format()
+    .font_style({FontStyle::bold})
+    .font_align(FontAlign::center)
+    .background_color(Color::blue)
+    .font_color(Color::white);
+}
+
+// Highlight high scores in green
+if (std::stoi(grades[1][1].get_text()) >= 90) {
+  grades[1][1].format().font_color(Color::green);
+}
+```
+
+### Conditional Formatting
+
+```cpp
+Table status_table;
+status_table.add_row({"Service", "Status"});
+status_table.add_row({"Database", "Online"});
+status_table.add_row({"API Server", "Offline"});
+status_table.add_row({"Cache", "Online"});
+
+// Color status cells based on content
+for (size_t i = 1; i < status_table.size(); ++i) {
+  std::string status = status_table[i][1].get_text();
+  if (status == "Online") {
+    status_table[i][1].format()
+      .font_color(Color::green)
+      .font_style({FontStyle::bold});
+  } else {
+    status_table[i][1].format()
+      .font_color(Color::red)
+      .font_style({FontStyle::bold});
+  }
+}
+```
+
+### Multi-byte Character Support
+
+```cpp
+Table international;
+international.add_row({"Language", "Greeting"});
+international.add_row({"Chinese", "你好"});
+international.add_row({"Japanese", "こんにちは"});
+international.add_row({"Korean", "안녕하세요"});
+
+// Enable multi-byte character support for greeting column
+for (size_t i = 1; i < international.size(); ++i) {
+  international[i][1].format().multi_byte_characters(true);
+}
+```
+
+### Creating Colored Cells
+
+```cpp
+Table color_demo;
+color_demo.add_row({"Red", "Green", "Blue"});
+
+color_demo[0][0].format()
+  .font_color(Color::white)
+  .background_color(Color::red)
+  .font_align(FontAlign::center);
+
+color_demo[0][1].format()
+  .font_color(Color::white)
+  .background_color(Color::green)
+  .font_align(FontAlign::center);
+
+color_demo[0][2].format()
+  .font_color(Color::white)
+  .background_color(Color::blue)
+  .font_align(FontAlign::center);
+```
+
+### Custom Cell Borders
+
+```cpp
+Table custom_borders;
+custom_borders.add_row({"A", "B", "C"});
+custom_borders.add_row({"D", "E", "F"});
+
+// Customize border for specific cell
+custom_borders[1][1].format()
+  .border_left(":")
+  .border_right(":")
+  .border_top("=")
+  .border_bottom("=")
+  .border_color(Color::yellow);
+```
+
+## Complete Example
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table weather;
+  
+  // Create table
+  weather.add_row({"City", "Temperature", "Condition"});
+  weather.add_row({"New York", "72°F", "Sunny"});
+  weather.add_row({"London", "58°F", "Cloudy"});
+  weather.add_row({"Tokyo", "68°F", "Rainy"});
+  weather.add_row({"Sydney", "80°F", "Clear"});
+  
+  // Format header cells
+  for (size_t i = 0; i < 3; ++i) {
+    weather[0][i].format()
+      .font_style({FontStyle::bold})
+      .font_color(Color::yellow)
+      .font_align(FontAlign::center);
+  }
+  
+  // Color temperature cells based on value
+  for (size_t i = 1; i < weather.size(); ++i) {
+    std::string temp_str = weather[i][1].get_text();
+    int temp = std::stoi(temp_str.substr(0, temp_str.find('°')));
+    
+    if (temp >= 75) {
+      weather[i][1].format().font_color(Color::red);
+    } else if (temp >= 65) {
+      weather[i][1].format().font_color(Color::yellow);
+    } else {
+      weather[i][1].format().font_color(Color::blue);
+    }
+  }
+  
+  // Format condition cells
+  for (size_t i = 1; i < weather.size(); ++i) {
+    std::string condition = weather[i][2].get_text();
+    if (condition == "Sunny" || condition == "Clear") {
+      weather[i][2].format().font_color(Color::green);
+    } else if (condition == "Rainy") {
+      weather[i][2].format().font_color(Color::blue);
+    } else {
+      weather[i][2].format().font_color(Color::grey);
+    }
+  }
+  
+  std::cout << weather << std::endl;
+  return 0;
+}
+```

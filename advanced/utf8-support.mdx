@@ -1,0 +1,181 @@
+---
+title: UTF-8 Support
+description: Learn how to work with multi-byte characters and internationalization in Tabulate
+---
+
+Tabulate provides comprehensive support for UTF-8 and multi-byte characters, enabling you to create tables with international text, special symbols, and Unicode content. The library uses `wcswidth` on Unix systems to accurately compute the display width of multi-byte characters.
+
+## Enabling Multi-byte Support
+
+To work with multi-byte characters, you must explicitly enable multi-byte character support using `.format().multi_byte_characters(true)`:
+
+```cpp
+table.column(1).format().multi_byte_characters(true);
+```
+
+<Note>
+Multi-byte character support is opt-in because calculating column width for multi-byte characters requires additional processing. Only enable it when your table contains multi-byte characters.
+</Note>
+
+## Complete Example: Multilingual Table
+
+This example displays "I love you" in different languages, demonstrating UTF-8 support:
+
+```cpp
+#include <tabulate/table.hpp>
+using namespace tabulate;
+
+int main() {
+  Table table;
+
+  table.format().corner("♥")
+    .font_style({FontStyle::bold})
+    .corner_color(Color::magenta)
+    .border_color(Color::magenta);
+
+  table.add_row({"English", "I love you"});
+  table.add_row({"French", "Je t'aime"});
+  table.add_row({"Spanish", "Te amo"});
+  table.add_row({"German", "Ich liebe Dich"});
+  table.add_row({"Mandarin Chinese", "我爱你"});
+  table.add_row({"Japanese", "愛してる"});
+  table.add_row({"Korean", "사랑해 (Saranghae)"});
+  table.add_row({"Greek", "Σ΄αγαπώ (Se agapo)"});
+  table.add_row({"Italian", "Ti amo"});
+  table.add_row({"Russian", "Я тебя люблю (Ya tebya liubliu)"});
+  table.add_row({"Hebrew", "אני אוהב אותך (Ani ohev otakh)"});
+
+  // Column 1 is using multi-byte characters
+  table.column(1).format().multi_byte_characters(true);
+
+  std::cout << table << std::endl;
+}
+```
+
+<Note>
+The source code for this example is available at `samples/unicode.cpp` in the repository.
+</Note>
+
+## When to Enable Multi-byte Support
+
+<Steps>
+  <Step title="Identify multi-byte content">
+    Determine which columns or cells contain non-ASCII characters (CJK languages, emoji, special symbols).
+  </Step>
+  
+  <Step title="Apply formatting">
+    Enable multi-byte support on those specific columns or cells, not the entire table.
+  </Step>
+  
+  <Step title="Test alignment">
+    Verify that text alignment works correctly with your system locale.
+  </Step>
+</Steps>
+
+## Setting Locale for Cells
+
+You can explicitly set the locale for individual cells or columns using `.format().locale(value)`:
+
+```cpp
+// Set English-US locale for first column
+table.column(0).format().locale("en_US.UTF-8");
+table[0][1].format().locale("en_US.UTF-8");
+
+// Set locale for individual cells
+table[1][1].format().locale("fr_FR.UTF-8");  // French
+table[2][1].format().locale("es_ES.UTF-8");  // Spanish
+table[3][1].format().locale("de_DE.UTF-8");  // German
+table[4][1].format().locale("zh_CN.UTF-8");  // Chinese
+table[5][1].format().locale("ja_JP.UTF-8");  // Japanese
+table[6][1].format().locale("ko_KR.UTF-8");  // Korean
+table[7][1].format().locale("el_GR.UTF-8");  // Greek
+table[8][1].format().locale("it_IT.UTF-8");  // Italian
+table[9][1].format().locale("ru_RU.UTF-8");  // Russian
+table[10][1].format().locale("he_IL.UTF-8"); // Hebrew
+```
+
+<Warning>
+Locale strings are system-specific. The code above may throw `std::runtime_error locale::facet::_S_create_c_locale name not valid` if the specified locale is not available on your system. Check available locales with `locale -a` on Unix systems.
+</Warning>
+
+## Common Multi-byte Use Cases
+
+### Special Symbols
+
+Multi-byte characters are useful for decorative borders and symbols:
+
+```cpp
+table.format()
+  .corner_top_left("ᛰ")
+  .corner_top_right("ᛯ")
+  .corner_bottom_left("ᛮ")
+  .corner_bottom_right("ᛸ")
+  .border_top("ᛜ")
+  .border_bottom("ᛜ")
+  .border_left("ᚿ")
+  .border_right("ᛆ")
+  .multi_byte_characters(true);
+```
+
+### Emoji Support
+
+```cpp
+table.format().corner("♥").multi_byte_characters(true);
+```
+
+### CJK Languages
+
+Chinese, Japanese, and Korean characters require multi-byte support:
+
+```cpp
+table.add_row({"Mandarin Chinese", "我爱你"});
+table.add_row({"Japanese", "愛してる"});
+table.add_row({"Korean", "사랑해"});
+table.column(1).format().multi_byte_characters(true);
+```
+
+## Platform Considerations
+
+### Unix/Linux/macOS
+
+- Uses `wcswidth` for character width calculation
+- Requires appropriate locale support
+- Check available locales with `locale -a`
+
+### Locale Availability
+
+On some systems (like older macOS versions), certain locales may not be available. For example, Arabic locale might be missing, which can cause alignment issues with Arabic text.
+
+<Warning>
+If you encounter alignment issues with specific languages, verify that your system has the appropriate locale installed. Missing locale support can prevent proper character width calculation.
+</Warning>
+
+## Best Practices
+
+1. **Enable selectively**: Only enable multi-byte support on columns/cells that need it
+2. **Test locales**: Verify locale availability before using `.format().locale()`
+3. **Use consistent encoding**: Ensure your source files are saved as UTF-8
+4. **Consider performance**: Multi-byte character width calculation has a performance cost
+5. **Check alignment**: Test your tables on the target system to ensure proper alignment
+
+## Troubleshooting
+
+### Alignment Issues
+
+If text doesn't align properly:
+
+1. Enable multi-byte character support: `.multi_byte_characters(true)`
+2. Verify the locale is available on your system
+3. Check that your terminal supports UTF-8 encoding
+
+### Locale Errors
+
+If you get locale errors:
+
+```cpp
+// Instead of:
+table[0][1].format().locale("ar_SA.UTF-8");  // May fail
+
+// Use:
+table.column(1).format().multi_byte_characters(true);  // More portable
+```
